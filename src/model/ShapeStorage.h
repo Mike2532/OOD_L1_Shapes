@@ -1,0 +1,8 @@
+//
+// Created by Mike on 13.09.2026.
+//
+
+#ifndef OOD_L1_SHAPES_SHAPESTORAGE_H
+#define OOD_L1_SHAPES_SHAPESTORAGE_H
+
+#endif //OOD_L1_SHAPES_SHAPESTORAGE_H
