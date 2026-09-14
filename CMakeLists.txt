@@ -34,6 +34,8 @@ target_link_options(PictureTest PRIVATE "LINKER:-all_load")
 
 add_executable(GfxTest src/gfx/impl/test/Test.cpp
         src/gfx/abstract/ICanvas.h
+        src/parser/Parser.cpp
+        src/parser/Parser.h
 )
 target_link_libraries(GfxTest PRIVATE lib_utils)
 target_link_libraries(GfxTest PRIVATE Catch2::Catch2WithMain)

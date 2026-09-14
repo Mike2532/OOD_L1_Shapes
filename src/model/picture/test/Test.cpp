@@ -92,6 +92,12 @@ TEST_CASE("add shapes and list them, delete one and list again")
     REQUIRE(secondResult == secondTargetOutput);
 }
 
+TEST_CASE("delete non-existent shape")
+{
+    auto picture = GetPicture();
+    picture->DeleteShape("aaaaa");
+}
+
 TEST_CASE("Two shapes with same id")
 {
     auto picture = GetPicture();
@@ -128,6 +134,46 @@ TEST_CASE("move shape")
     std::string secondResult = secondOutput.str();
     std::string secondTargetOutput = "1 rectangle secondShapeId #ffffff 4.00 6.00 3.00 4.00\n";
     REQUIRE(secondResult == secondTargetOutput);
+}
+
+TEST_CASE("move non-existing shape")
+{
+    auto picture = GetPicture();
+    REQUIRE_THROWS_MATCHES(
+        picture->MoveShape("aaaaa", 3, 4),
+        std::runtime_error,
+        Catch::Matchers::Message("can not get shape with id aaaaa")
+    );
+}
+
+TEST_CASE("change color non-existing shape")
+{
+    auto picture = GetPicture();
+    REQUIRE_THROWS_MATCHES(
+        picture->ChangeColor("aaaaa", "#000000"),
+        std::runtime_error,
+        Catch::Matchers::Message("can not get shape with id aaaaa")
+    );
+}
+
+TEST_CASE("change startegy non-existing shape")
+{
+    auto picture = GetPicture();
+    REQUIRE_THROWS_MATCHES(
+        picture->ChangeShape("aaaaa", "circle", {"1", "2","3"}),
+        std::runtime_error,
+        Catch::Matchers::Message("can not get shape with id aaaaa")
+    );
+}
+
+TEST_CASE("draw non-existing shape")
+{
+    auto picture = GetPicture();
+    REQUIRE_THROWS_MATCHES(
+        picture->DrawShape("aaaaa"),
+        std::runtime_error,
+        Catch::Matchers::Message("can not get shape with id aaaaa")
+    );
 }
 
 TEST_CASE("move picture")

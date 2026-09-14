@@ -1,9 +1,21 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
 #include "src/gfx/impl/SFMLCanvas.h"
 
 int main()
 {
+    std::string userInput;
+    while (std::getline(std::cin, userInput)) {
+        if (userInput.empty()) {
+            continue;
+        }
+
+        std::stringstream stream(userInput);
+    }
+
+
+    //
     const unsigned W = 800;
     const unsigned H = 600;
     sf::RenderWindow window(sf::VideoMode({W, H}), "Shapes");

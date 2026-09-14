@@ -94,7 +94,7 @@ namespace model {
         if (shape.has_value()) {
             return shape.value();
         }
-        throw std::runtime_error("can not get shape with id" + id);
+        throw std::runtime_error("can not get shape with id " + id);
     }
 
     std::unique_ptr<strategy::IShapeStrategy> Picture::GetExistingStrategy(
