@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "StrategyStorage.h"
+#include "IShapeStrategy.h"
 
 namespace strategy {
     template <typename StrategyNamed>
@@ -16,7 +17,7 @@ namespace strategy {
         struct Register {
             Register() {
                 StrategyStorage::Store(StrategyNamed::GetStrategyName(), [](const std::vector<std::string>& args) {
-                    return std::make_shared<T>(args);
+                    return std::make_unique<T>(args);
                 });
             }
         };

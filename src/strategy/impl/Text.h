@@ -3,20 +3,32 @@
 
 #include <string>
 #include "../abstract/AutoRegisterStrategy.h"
+#include "../point/Point.h"
 
 namespace strategy {
     struct TextStrategyName {
         static std::string GetStrategyName()
         {
-            return "circle";
+            return "text";
         }
     };
 
-    class Text : AutoRegisterStrategy<Text, TextStrategyName>
+    class Text : public AutoRegisterStrategy<Text, TextStrategyName>
     {
     public:
+        Text(const std::vector<std::string>& args);
+
         void Move(double dx, double dy) override;
+
         void Draw() override;
+
+        std::string GetArgsAsString() override;
+
+        std::string GetStrategyName() override;
+    private:
+        Point pivotPoint;
+        double m_textSize;
+        std::string m_text;
     };
 }
 

@@ -1,7 +1,7 @@
-#include "./Line.h"
+#include "Triangle.h"
 
 namespace strategy {
-    Line::Line(const std::vector<std::string> &args) {
+    Triangle::Triangle(const std::vector<std::string> &args) {
         RequireArgumentsSize(TARGET_ARGUMENTS_SIZE, args);
         for (const auto& i : targetIndexes)
         {
@@ -12,29 +12,29 @@ namespace strategy {
         }
     }
 
-    void Line::Move(double dx, double dy) {
+    void Triangle::Move(double dx, double dy) {
         for (auto& verticle : vertices)
         {
             verticle.Move(dx, dy);
         }
     }
 
-    void Line::Draw()
+    void Triangle::Draw()
     {
     }
 
-    std::string Line::GetArgsAsString() {
+    std::string Triangle::GetArgsAsString() {
         std::string result;
         for (const auto& vecticle : vertices) {
             auto coords = vecticle.GetCoords();
-            result += ConvertNumberToString(coords.first) + ' ' + ConvertNumberToString(coords.second) + ' ';
+            result += ConvertNumberToString(coords.first) + ' ' + ConvertNumberToString(coords.second);
         }
         return result;
     }
 
-    std::string Line::GetStrategyName() {
-        return LineStrategyName::GetStrategyName();
+    std::string Triangle::GetStrategyName() {
+        return TriangleStrategyName::GetStrategyName();
     }
 
-    template class AutoRegisterStrategy<Line, LineStrategyName>;
+    template class AutoRegisterStrategy<Triangle, TriangleStrategyName>;
 }

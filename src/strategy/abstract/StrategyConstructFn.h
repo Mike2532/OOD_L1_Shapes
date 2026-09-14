@@ -7,7 +7,7 @@
 #include "IShapeStrategy.h"
 
 namespace strategy {
-    using StrategyConstructFn = std::function<std::shared_ptr<IShapeStrategy>(const std::vector<std::string>&)>;
+    using StrategyConstructFn = std::function<std::unique_ptr<IShapeStrategy>(const std::vector<std::string>&)>;
 }
 
 #endif // STRATEGYCONSTRUCTFN_H

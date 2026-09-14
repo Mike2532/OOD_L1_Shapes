@@ -1,17 +1,20 @@
 #ifndef OOD_L1_SHAPES_STRATEGYSTORAGE_H
 #define OOD_L1_SHAPES_STRATEGYSTORAGE_H
 
+#include <iostream>
 #include <memory>
 #include <optional>
+#include <ostream>
 #include <vector>
 
+#include "IStrategyStorage.h"
 #include "StrategyConstructFn.h"
 
 namespace strategy {
-    class StrategyStorage
+    class StrategyStorage : public IStrategyStorage
     {
     public:
-        std::optional<std::shared_ptr<IShapeStrategy>> Construct(const std::string& strategyName, const std::vector<std::string>& args)
+        std::optional<std::unique_ptr<IShapeStrategy>> Construct(const std::string& strategyName, const std::vector<std::string>& args)
         {
             if (storage.contains(strategyName)) {
                 return storage[strategyName](args);

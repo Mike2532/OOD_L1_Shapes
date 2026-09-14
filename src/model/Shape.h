@@ -20,7 +20,9 @@ namespace model {
         {
         }
 
-        std::string GetId();
+        std::string GetId() {
+            return m_shapeId;
+        }
 
         std::string GetColor() {
             return m_color;
@@ -45,6 +47,16 @@ namespace model {
         virtual void Draw()
         {
             m_strategy->Draw();
+        }
+
+        std::string GetArgsAsString()
+        {
+            return m_strategy->GetArgsAsString();
+        }
+
+        std::string GetStrategyName()
+        {
+            return m_strategy->GetStrategyName();
         }
     private:
         const std::string m_shapeId;

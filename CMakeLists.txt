@@ -1,24 +1,21 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 4.0)
 project(OOD_L1_Shapes)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(OOD_L1_Shapes main.cpp
-        src/strategy/abstract/IShapeStrategy.h
-        src/strategy/abstract/StrategyConstructFn.h
-        src/strategy/abstract/StrategyStorage.h
-        src/strategy/abstract/AutoRegisterStrategy.h
-        src/strategy/abstract/AutoRegisterStrategy.h
-        src/strategy/impl/Circle.cpp
-        src/strategy/impl/Circle.h
-        src/strategy/impl/Rectangle.cpp
-        src/strategy/impl/Rectangle.h
-        src/strategy/impl/Line.cpp
-        src/strategy/impl/Line.h
-        src/strategy/impl/Text.cpp
-        src/strategy/impl/Text.h
-        src/model/Shape.h
-        src/model/picture/Picture.cpp
-        src/model/picture/Picture.h
-        src/model/shapeStorage/IShapeStorage.h
-)
+enable_testing()
+
+find_package(Catch2 3 REQUIRED)
+
+file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*.h")
+list(FILTER SOURCES EXCLUDE REGEX ".*/test/.*")
+add_library(lib_utils ${SOURCES})
+
+add_executable(OOD_L1_Shapes main.cpp)
+target_link_libraries(OOD_L1_Shapes PRIVATE lib_utils)
+
+target_link_options(OOD_L1_Shapes PRIVATE "LINKER:-all_load")
+
+add_executable(ShapeStorageTest src/model/shapeStorage/test/Test.cpp)
+target_link_libraries(ShapeStorageTest PRIVATE lib_utils)
+target_link_libraries(ShapeStorageTest PRIVATE Catch2::Catch2WithMain)
