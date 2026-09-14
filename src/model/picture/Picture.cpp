@@ -71,7 +71,7 @@ namespace model {
             result += shape->GetArgsAsString();
             result += '\n';
         }
-        output << result << std::endl;
+        output << result;
     }
 
     void Picture::MovePicture(double dx, double dy)

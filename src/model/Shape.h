@@ -18,6 +18,10 @@ namespace model {
             m_color(std::move(color)),
             m_strategy(std::move(strategy))
         {
+            std::regex pattern("^#[0-9a-f]{6}$");
+            if (!std::regex_match(m_color, pattern)) {
+                throw std::invalid_argument("invalid color. Color must be format #rrggbb");
+            }
         }
 
         std::string GetId() {

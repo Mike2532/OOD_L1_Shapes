@@ -14,8 +14,8 @@ namespace strategy {
 
         void Move(const double dx, const double dy)
         {
-            m_xCoord -= dx;
-            m_yCoord -= dy;
+            m_xCoord += dx;
+            m_yCoord += dy;
         }
 
         std::pair<double, double> GetCoords() const

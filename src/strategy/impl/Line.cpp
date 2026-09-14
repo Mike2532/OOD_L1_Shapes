@@ -25,9 +25,14 @@ namespace strategy {
 
     std::string Line::GetArgsAsString() {
         std::string result;
-        for (const auto& vecticle : vertices) {
+        auto vecticleSize = vertices.size();
+        for (auto i = 0; i < vecticleSize; i++) {
+            auto vecticle = vertices[i];
             auto coords = vecticle.GetCoords();
-            result += ConvertNumberToString(coords.first) + ' ' + ConvertNumberToString(coords.second) + ' ';
+            result += ConvertNumberToString(coords.first) + ' ' + ConvertNumberToString(coords.second);
+            if (i != vecticleSize - 1) {
+                result += ' ';
+            }
         }
         return result;
     }

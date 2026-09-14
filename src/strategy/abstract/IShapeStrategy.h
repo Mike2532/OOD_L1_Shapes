@@ -14,15 +14,6 @@ namespace strategy {
         virtual std::string GetStrategyName() = 0;
 
     protected:
-        void RequireColorIsCorrect(const std::string& color)
-        {
-            std::regex pattern("^#[0-9a-f]{6}$");
-            if (std::regex_match(color, pattern)) {
-                return;
-            }
-            throw std::invalid_argument("invalid color. Color must be format #rrggbb");
-        }
-
         void RequireNumberIsNonNegative(const std::string& numberName, double number)
         {
             if (number < 0.0 ) {
