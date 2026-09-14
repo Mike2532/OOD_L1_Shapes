@@ -2,7 +2,7 @@
 #define OOD_L1_SHAPES_TEXT_H
 
 #include <string>
-#include "../abstract/AutoRegisterStrategy.h"
+#include "../abstract/StrategyRegister.h"
 #include "../point/Point.h"
 
 namespace strategy {
@@ -13,14 +13,14 @@ namespace strategy {
         }
     };
 
-    class Text : public AutoRegisterStrategy<Text, TextStrategyName>
+    class Text : public StrategyRegister<Text, TextStrategyName>
     {
     public:
         Text(const std::vector<std::string>& args);
 
         void Move(double dx, double dy) override;
 
-        void Draw() override;
+        void Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color) override;
 
         std::string GetArgsAsString() override;
 

@@ -1,9 +1,15 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "../../shapeStorage/ShapeStorage.h"
 #include "../../../strategy/abstract/StrategyStorage.h"
 #include "../Picture.h"
+#include "../../../gfx/impl/SFMLCanvas.h"
+
+const unsigned W = 800;
+const unsigned H = 600;
+std::string fontPath = "/System/Library/Fonts/Helvetica.ttc";
 
 std::unique_ptr<model::Picture> GetPicture()
 {
@@ -11,7 +17,21 @@ std::unique_ptr<model::Picture> GetPicture()
     auto strategyStorage = std::make_unique<strategy::StrategyStorage>();
     return std::make_unique<model::Picture>(
         std::move(shapeStorage),
-        std::move(strategyStorage)
+        std::move(strategyStorage),
+        nullptr
+    );
+}
+
+std::unique_ptr<model::Picture> GetPictureWithCanvas(sf::RenderWindow& window, sf::Font font)
+{
+    auto canvas = std::make_unique<gfx::SFMLCanvas>(window, font);
+
+    auto shapeStorage = std::make_unique<model::ShapeStorage>();
+    auto strategyStorage = std::make_unique<strategy::StrategyStorage>();
+    return std::make_unique<model::Picture>(
+        std::move(shapeStorage),
+        std::move(strategyStorage),
+        std::move(canvas)
     );
 }
 
@@ -176,4 +196,73 @@ TEST_CASE("change shape")
     std::string secondResult = secondOutput.str();
     std::string secondTargetOutput = "1 circle secondShapeId #ffffff 1.00 2.00 3.00\n";
     REQUIRE(secondResult == secondTargetOutput);
+}
+
+TEST_CASE("draw shape by id")
+{
+    sf::RenderWindow window(sf::VideoMode({W, H}), "Shapes");
+
+    sf::Font font;
+    if (!font.openFromFile(fontPath)) {
+        throw std::runtime_error("Failed to load font file: " + fontPath);
+    }
+
+    auto picture = GetPictureWithCanvas(window, font);
+
+    std::string firstColor = "#1f0ccc";
+    std::string fistShapeId = "fistShapeId";
+    std::string firstShapeType = "circle";
+    std::vector<std::string> firstShapeArgs{"100", "200","100"};
+    picture->AddShape(fistShapeId, firstColor, firstShapeType, firstShapeArgs);
+
+    picture->DrawShape(fistShapeId);
+}
+
+TEST_CASE("draw all shape types")
+{
+    sf::RenderWindow window(sf::VideoMode({W, H}), "Shapes");
+
+    sf::Font font;
+    if (!font.openFromFile(fontPath)) {
+        throw std::runtime_error("Failed to load font file: " + fontPath);
+    }
+
+    auto picture = GetPictureWithCanvas(window, font);
+
+     picture->AddShape(
+         "shapeId",
+         "#1f0ccc",
+         "circle",
+         {"100", "200","100"}
+     );
+
+    picture->AddShape(
+        "lineId",
+        "#000000",
+        "line",
+{"400", "400","600", "400"}
+    );
+
+    picture->AddShape(
+        "rectangleId",
+        "#ff4400",
+        "rectangle",
+{"300", "300","150", "220"}
+    );
+
+    picture->AddShape(
+        "textId",
+        "#c8ff00",
+        "text",
+{"0", "0","25", "hello world!"}
+    );
+
+    picture->AddShape(
+        "triangleId",
+        "#9900ff",
+        "triangle",
+{"10", "50","200", "30", "75", "75"}
+    );
+
+    picture->DrawPicture();
 }

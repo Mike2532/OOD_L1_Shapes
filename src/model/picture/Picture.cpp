@@ -52,7 +52,7 @@ namespace model {
     void Picture::DrawShape(const std::string &id)
     {
         auto shape = GetExistingShape(id);
-        shape->Draw(); //todo подумать
+        ShowShapes({shape});
     }
 
     void Picture::List(std::ostream& output)
@@ -85,9 +85,7 @@ namespace model {
     void Picture::DrawPicture()
     {
         auto shapes = m_shapeStorage->GetAll();
-        for (const auto& shape : shapes) {
-            shape->Draw(); //todo подумать
-        }
+        ShowShapes(shapes);
     }
 
     std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)
@@ -115,6 +113,22 @@ namespace model {
         auto shape = m_shapeStorage->GetById(id);
         if (shape.has_value()) {
             throw std::runtime_error("shape with id " + id + " already exists");
+        }
+    }
+
+    void Picture::ShowShapes(const std::vector<std::shared_ptr<Shape>> &shapes) {
+        while (m_canvas->IsActive()) {
+            if (m_canvas->NeedToClose()) {
+                m_canvas->Close();
+            }
+
+            m_canvas->Clear();
+
+            for (const auto& shape : shapes) {
+                shape->Draw(m_canvas);
+            }
+
+            m_canvas->Display();
         }
     }
 }

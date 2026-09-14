@@ -10,6 +10,12 @@ namespace strategy {
                 std::stod(args[i+1])
             );
         }
+        auto firstCoord = vertices[0].GetCoords();
+        auto secondCoord = vertices[1].GetCoords();
+        auto thirdCoord = vertices[2].GetCoords();
+        if (firstCoord == secondCoord || secondCoord == thirdCoord || firstCoord == thirdCoord) {
+            throw std::invalid_argument("can not construct triangle from same points");
+        }
     }
 
     void Triangle::Move(double dx, double dy) {
@@ -19,8 +25,13 @@ namespace strategy {
         }
     }
 
-    void Triangle::Draw()
+    void Triangle::Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color)
     {
+        auto startCoords = vertices[0].GetCoords();
+        canvas->MoveTo(startCoords.first, startCoords.second);
+        canvas->LineTo(vertices[1].GetCoords().first, vertices[1].GetCoords().second);
+        canvas->LineTo(vertices[2].GetCoords().first, vertices[2].GetCoords().second);
+        canvas->LineTo(vertices[0].GetCoords().first, vertices[0].GetCoords().second);
     }
 
     std::string Triangle::GetArgsAsString() {
@@ -41,5 +52,5 @@ namespace strategy {
         return TriangleStrategyName::GetStrategyName();
     }
 
-    template class AutoRegisterStrategy<Triangle, TriangleStrategyName>;
+    template class StrategyRegister<Triangle, TriangleStrategyName>;
 }

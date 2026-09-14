@@ -19,8 +19,15 @@ namespace strategy {
         pivotPoint.Move(dx, dy);
     }
 
-    void Text::Draw()
+    void Text::Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color)
     {
+        canvas->SetColor(color);
+        canvas->DrawText(
+            pivotPoint.GetCoords().first,
+            pivotPoint.GetCoords().second,
+            m_textSize,
+            m_text
+        );
     }
 
     std::string Text::GetArgsAsString() {
@@ -34,5 +41,5 @@ namespace strategy {
         return TextStrategyName::GetStrategyName();
     }
 
-    template class AutoRegisterStrategy<Text, TextStrategyName>;
+    template class StrategyRegister<Text, TextStrategyName>;
 }

@@ -3,21 +3,23 @@
 #include <format>
 #include <regex>
 
+#include "../../gfx/abstract/ICanvas.h"
+
 namespace strategy {
     class IShapeStrategy
     {
     public:
         virtual ~IShapeStrategy() = default;
         virtual void Move(double dx, double dy) = 0;
-        virtual void Draw() = 0; //todo add params)
+        virtual void Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color) = 0;
         virtual std::string GetArgsAsString() = 0;
         virtual std::string GetStrategyName() = 0;
 
     protected:
         void RequireNumberIsNonNegative(const std::string& numberName, double number)
         {
-            if (number < 0.0 ) {
-                throw std::invalid_argument(numberName + " must be non negative");
+            if (number <= 0.0 ) {
+                throw std::invalid_argument(numberName + " must be positive");
             }
         }
 

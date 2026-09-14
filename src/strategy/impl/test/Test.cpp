@@ -33,7 +33,7 @@ TEST_CASE("circle negative radius") {
     REQUIRE_THROWS_MATCHES(
         strategy::Circle(args),
         std::invalid_argument,
-        Catch::Matchers::Message("raduis must be non negative")
+        Catch::Matchers::Message("raduis must be positive")
     );
 }
 
@@ -101,6 +101,18 @@ TEST_CASE("line too much arguments") {
     );
 }
 
+TEST_CASE("line with two same points")
+{
+    std::string xPos = "1";
+    std::string yPos = "2";
+    std::vector args{xPos, yPos, xPos, yPos};
+    REQUIRE_THROWS_MATCHES(
+        strategy::Line(args),
+        std::invalid_argument,
+        Catch::Matchers::Message("cannot construct line from same points")
+    );
+}
+
 TEST_CASE("standart rectangle")
 {
     std::string xPos = "1";
@@ -153,7 +165,7 @@ TEST_CASE("rectangle negative width")
     REQUIRE_THROWS_MATCHES(
         strategy::Rectangle(args),
         std::invalid_argument,
-        Catch::Matchers::Message("width must be non negative")
+        Catch::Matchers::Message("width must be positive")
     );
 }
 
@@ -167,7 +179,7 @@ TEST_CASE("rectangle negative height")
     REQUIRE_THROWS_MATCHES(
         strategy::Rectangle(args),
         std::invalid_argument,
-        Catch::Matchers::Message("height must be non negative")
+        Catch::Matchers::Message("height must be positive")
     );
 }
 
@@ -223,7 +235,7 @@ TEST_CASE("text negative text size")
     REQUIRE_THROWS_MATCHES(
         strategy::Text(args),
         std::invalid_argument,
-        Catch::Matchers::Message("text size must be non negative")
+        Catch::Matchers::Message("text size must be positive")
     );
 }
 
@@ -268,5 +280,50 @@ TEST_CASE("triangle too much arguments") {
         strategy::Triangle(args),
         std::runtime_error,
         Catch::Matchers::Message("wrong number of arguments. Found: 7 Expected: 6")
+    );
+}
+
+TEST_CASE("trinagle with same points 1 and 2") {
+    std::string xPos = "1";
+    std::string yPos = "2";
+    std::string xPos2 = "1";
+    std::string yPos2 = "2";
+    std::string xPos3 = "5";
+    std::string yPos3 = "6";
+    std::vector args{xPos, yPos, xPos2, yPos2, xPos3, yPos3};
+    REQUIRE_THROWS_MATCHES(
+        strategy::Triangle(args),
+        std::invalid_argument,
+        Catch::Matchers::Message("can not construct triangle from same points")
+    );
+}
+
+TEST_CASE("trinagle with same points 1 and 3") {
+    std::string xPos = "1";
+    std::string yPos = "2";
+    std::string xPos2 = "3";
+    std::string yPos2 = "4";
+    std::string xPos3 = "1";
+    std::string yPos3 = "2";
+    std::vector args{xPos, yPos, xPos2, yPos2, xPos3, yPos3};
+    REQUIRE_THROWS_MATCHES(
+        strategy::Triangle(args),
+        std::invalid_argument,
+        Catch::Matchers::Message("can not construct triangle from same points")
+    );
+}
+
+TEST_CASE("trinagle with same points 2 and 3") {
+    std::string xPos = "1";
+    std::string yPos = "2";
+    std::string xPos2 = "3";
+    std::string yPos2 = "4";
+    std::string xPos3 = "3";
+    std::string yPos3 = "4";
+    std::vector args{xPos, yPos, xPos2, yPos2, xPos3, yPos3};
+    REQUIRE_THROWS_MATCHES(
+        strategy::Triangle(args),
+        std::invalid_argument,
+        Catch::Matchers::Message("can not construct triangle from same points")
     );
 }

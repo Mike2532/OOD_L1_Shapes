@@ -20,8 +20,20 @@ namespace strategy {
         pivotPoint.Move(dx, dy);
     }
 
-    void Rectangle::Draw()
+    void Rectangle::Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color)
     {
+        canvas->SetColor(color);
+
+        auto coords = pivotPoint.GetCoords();
+        auto xPos = coords.first;
+        auto yPos = coords.second;
+
+        canvas->MoveTo(xPos, yPos);
+
+        canvas->LineTo(xPos + m_width, yPos);
+        canvas->LineTo(xPos + m_width, yPos + m_height);
+        canvas->LineTo(xPos, yPos + m_height);
+        canvas->LineTo(xPos, yPos);
     }
 
     std::string Rectangle::GetArgsAsString() {
@@ -35,5 +47,5 @@ namespace strategy {
         return RectangleStrategyName::GetStrategyName();
     }
 
-    template class AutoRegisterStrategy<Rectangle, RectangleStrategyName>;
+    template class StrategyRegister<Rectangle, RectangleStrategyName>;
 }

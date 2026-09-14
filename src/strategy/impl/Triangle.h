@@ -1,8 +1,9 @@
 #ifndef OOD_L1_SHAPES_TRIANGLE_H
 #define OOD_L1_SHAPES_TRIANGLE_H
+
 #include <string>
 
-#include "../abstract/AutoRegisterStrategy.h"
+#include "../abstract/StrategyRegister.h"
 #include "../Point/Point.h"
 
 namespace strategy {
@@ -12,13 +13,13 @@ namespace strategy {
         }
     };
 
-    class Triangle : public AutoRegisterStrategy<Triangle, TriangleStrategyName> {
+    class Triangle : public StrategyRegister<Triangle, TriangleStrategyName> {
     public:
         Triangle(const std::vector<std::string>& args);
 
         void Move(double dx, double dy) override;
 
-        void Draw() override;
+        void Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color) override;
 
         std::string GetArgsAsString() override;
 

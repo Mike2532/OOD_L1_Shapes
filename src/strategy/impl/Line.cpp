@@ -10,6 +10,9 @@ namespace strategy {
                 std::stod(args[i+1])
             );
         }
+        if (vertices[0].GetCoords() == vertices[1].GetCoords()) {
+            throw std::invalid_argument("cannot construct line from same points");
+        }
     }
 
     void Line::Move(double dx, double dy) {
@@ -19,8 +22,15 @@ namespace strategy {
         }
     }
 
-    void Line::Draw()
+    void Line::Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color)
     {
+        canvas->SetColor(color);
+
+        auto startCoords = vertices[0].GetCoords();
+        auto endCoords = vertices[1].GetCoords();
+
+        canvas->MoveTo(startCoords.first, startCoords.second);
+        canvas->LineTo(endCoords.first, endCoords.second);
     }
 
     std::string Line::GetArgsAsString() {
@@ -41,5 +51,5 @@ namespace strategy {
         return LineStrategyName::GetStrategyName();
     }
 
-    template class AutoRegisterStrategy<Line, LineStrategyName>;
+    template class StrategyRegister<Line, LineStrategyName>;
 }

@@ -18,8 +18,11 @@ namespace strategy {
         pivotPoint.Move(dx, dy);
     }
 
-    void Circle::Draw()
+    void Circle::Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color)
     {
+        canvas->SetColor(color);
+        auto coords = pivotPoint.GetCoords();
+        canvas->DrawEllipse(coords.first, coords.second, m_radius, m_radius);
     }
 
     std::string Circle::GetArgsAsString() {
@@ -31,5 +34,5 @@ namespace strategy {
         return CircleStrategyName::GetStrategyName();
     }
 
-    template class AutoRegisterStrategy<Circle, CircleStrategyName>;
+    template class StrategyRegister<Circle, CircleStrategyName>;
 }

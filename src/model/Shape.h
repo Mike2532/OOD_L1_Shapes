@@ -3,6 +3,7 @@
 #include <memory>
 #include <utility>
 
+#include "../gfx/abstract/ICanvas.h"
 #include "../strategy/abstract/IShapeStrategy.h"
 
 namespace model {
@@ -47,10 +48,9 @@ namespace model {
             m_strategy->Move(dx, dy);
         }
 
-        //todo add params)
-        virtual void Draw()
+        virtual void Draw(std::unique_ptr<gfx::ICanvas>& canvas)
         {
-            m_strategy->Draw();
+            m_strategy->Draw(canvas, m_color);
         }
 
         std::string GetArgsAsString()

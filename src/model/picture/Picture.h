@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "../Shape.h"
+#include "../../gfx/abstract/ICanvas.h"
 #include "../../strategy/abstract/IStrategyStorage.h"
 #include "../shapeStorage/IShapeStorage.h"
 
@@ -14,8 +15,11 @@ namespace model {
     public:
         Picture(
             std::unique_ptr<IShapeStorage> shapeStorage,
-            std::unique_ptr<strategy::IStrategyStorage> strategyStorage
-        ) : m_shapeStorage(std::move(shapeStorage)), m_strategyStorage(std::move(strategyStorage))
+            std::unique_ptr<strategy::IStrategyStorage> strategyStorage,
+            std::unique_ptr<gfx::ICanvas> canvas
+        ) : m_shapeStorage(std::move(shapeStorage)),
+            m_strategyStorage(std::move(strategyStorage)),
+            m_canvas(std::move(canvas))
         {
         }
 
@@ -31,10 +35,12 @@ namespace model {
     private:
         std::unique_ptr<IShapeStorage> m_shapeStorage;
         std::unique_ptr<strategy::IStrategyStorage> m_strategyStorage;
+        std::unique_ptr<gfx::ICanvas> m_canvas;
 
         std::shared_ptr<Shape> GetExistingShape(const std::string &id);
         std::unique_ptr<strategy::IShapeStrategy> GetExistingStrategy(const std::string& shapeType, const std::vector<std::string>& args);
         void RequireShapeDoesNotExist(const std::string& id);
+        void ShowShapes(const std::vector<std::shared_ptr<Shape>>& shapes);
     };
 }
 

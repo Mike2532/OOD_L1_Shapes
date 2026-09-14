@@ -12,7 +12,7 @@ namespace strategy {
     };
 
     template <typename T, typename StrategyNamed>
-    class AutoRegisterStrategy : private StrategyStorage, public IShapeStrategy
+    class StrategyRegister : private StrategyStorage, public IShapeStrategy
     {
         struct Register {
             Register() {

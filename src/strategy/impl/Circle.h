@@ -1,7 +1,7 @@
 #ifndef OOD_L1_SHAPES_CIRCLE_H
 #define OOD_L1_SHAPES_CIRCLE_H
 
-#include "../abstract/AutoRegisterStrategy.h"
+#include "../abstract/StrategyRegister.h"
 #include "../point/Point.h"
 
 namespace strategy {
@@ -12,14 +12,14 @@ namespace strategy {
         }
     };
 
-    class Circle : public AutoRegisterStrategy<Circle, CircleStrategyName>
+    class Circle : public StrategyRegister<Circle, CircleStrategyName>
     {
     public:
         explicit Circle(const std::vector<std::string>& args);
 
         void Move(double dx, double dy) override;
 
-        void Draw() override;
+        void Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color) override;
 
         std::string GetArgsAsString() override;
 

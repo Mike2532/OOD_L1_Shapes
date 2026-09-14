@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../abstract/AutoRegisterStrategy.h"
+#include "../abstract/StrategyRegister.h"
 #include "../point/Point.h"
 
 namespace strategy {
@@ -14,14 +14,14 @@ namespace strategy {
         }
     };
 
-    class Line : public AutoRegisterStrategy<Line, LineStrategyName>
+    class Line : public StrategyRegister<Line, LineStrategyName>
     {
     public:
         Line(const std::vector<std::string>& args);
 
         void Move(double dx, double dy) override;
 
-        void Draw() override;
+        void Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color) override;
 
         std::string GetArgsAsString() override;
 
