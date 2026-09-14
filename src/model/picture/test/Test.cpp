@@ -155,3 +155,25 @@ TEST_CASE("change shape color")
     std::string secondTargetOutput = "1 rectangle secondShapeId #dddddd 1.00 2.00 3.00 4.00\n";
     REQUIRE(secondResult == secondTargetOutput);
 }
+
+TEST_CASE("change shape")
+{
+    auto picture = GetPicture();
+
+    std::string defaultColor = "#ffffff";
+
+    std::string secondShapeId = "secondShapeId";
+    std::string secondShapeType = "rectangle";
+    std::vector<std::string> secondShapeArgs{"1", "2","3", "4"};
+    picture->AddShape(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+
+    std::string firstShapeType = "circle";
+    std::vector<std::string> firstShapeArgs{"1", "2","3"};
+    picture->ChangeShape(secondShapeId, firstShapeType, firstShapeArgs);
+
+    std::ostringstream secondOutput;
+    picture->List(secondOutput);
+    std::string secondResult = secondOutput.str();
+    std::string secondTargetOutput = "1 circle secondShapeId #ffffff 1.00 2.00 3.00\n";
+    REQUIRE(secondResult == secondTargetOutput);
+}
