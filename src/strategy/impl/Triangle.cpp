@@ -35,6 +35,14 @@ namespace strategy {
     }
 
     std::string Triangle::GetArgsAsString() {
+        return GetCoords();
+    }
+
+    std::string Triangle::GetStrategyName() {
+        return TriangleStrategyName::GetStrategyName();
+    }
+
+    std::string Triangle::GetCoords() {
         std::string result;
         auto vecticleSize = vertices.size();
         for (auto i = 0; i < vecticleSize; i++) {
@@ -46,10 +54,6 @@ namespace strategy {
             }
         }
         return result;
-    }
-
-    std::string Triangle::GetStrategyName() {
-        return TriangleStrategyName::GetStrategyName();
     }
 
     template class StrategyRegister<Triangle, TriangleStrategyName>;

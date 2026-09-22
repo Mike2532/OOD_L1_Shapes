@@ -37,14 +37,18 @@ namespace strategy {
     }
 
     std::string Rectangle::GetArgsAsString() {
-        auto coords = pivotPoint.GetCoords();
-        return ConvertNumberToString(coords.first) + ' ' +
-            ConvertNumberToString(coords.second) + ' ' +
-            ConvertNumberToString(m_width) + ' ' + ConvertNumberToString(m_height);
+        auto coords = GetCoords();
+        return coords + ' ' + ConvertNumberToString(m_width) + ' ' + ConvertNumberToString(m_height);
     }
 
     std::string Rectangle::GetStrategyName() {
         return RectangleStrategyName::GetStrategyName();
+    }
+
+    std::string Rectangle::GetCoords() {
+        auto coords = pivotPoint.GetCoords();
+        return ConvertNumberToString(coords.first) + ' ' +
+            ConvertNumberToString(coords.second);
     }
 
     template class StrategyRegister<Rectangle, RectangleStrategyName>;

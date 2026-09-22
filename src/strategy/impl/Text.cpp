@@ -31,14 +31,19 @@ namespace strategy {
     }
 
     std::string Text::GetArgsAsString() {
-        auto coords = pivotPoint.GetCoords();
-        return ConvertNumberToString(coords.first) + ' ' +
-            ConvertNumberToString(coords.second) + ' ' +
-            ConvertNumberToString(m_textSize) + ' ' + m_text;
+        auto coords = GetCoords();
+        return coords + ' ' + ConvertNumberToString(m_textSize) + ' ' + m_text;
     }
 
     std::string Text::GetStrategyName() {
         return TextStrategyName::GetStrategyName();
+    }
+
+    std::string Text::GetCoords()
+    {
+        auto coords = pivotPoint.GetCoords();
+        return ConvertNumberToString(coords.first) + ' ' +
+            ConvertNumberToString(coords.second);
     }
 
     template class StrategyRegister<Text, TextStrategyName>;

@@ -25,6 +25,8 @@ namespace strategy {
         std::string GetArgsAsString() override;
 
         std::string GetStrategyName() override;
+
+        std::string GetCoords() override;
     private:
         Point pivotPoint;
         double m_textSize;

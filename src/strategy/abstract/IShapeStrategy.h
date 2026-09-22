@@ -14,6 +14,7 @@ namespace strategy {
         virtual void Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color) = 0;
         virtual std::string GetArgsAsString() = 0;
         virtual std::string GetStrategyName() = 0;
+        virtual std::string GetCoords() = 0;
 
     protected:
         void RequireNumberIsNonNegative(const std::string& numberName, double number)

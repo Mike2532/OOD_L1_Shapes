@@ -36,6 +36,12 @@ add_executable(GfxTest src/gfx/impl/test/Test.cpp
         src/gfx/abstract/ICanvas.h
         src/parser/Parser.cpp
         src/parser/Parser.h
+        src/model/observe/shape/IShapeObserver.h
+        src/model/observe/shape/ShapeEvent.h
+        src/model/observe/shape/INotificationShape.h
+        src/model/observe/picture/IPictureObserver.h
+        src/model/observe/picture/PictureEvent.h
+        src/model/observe/picture/PictureObserver.h
 )
 target_link_libraries(GfxTest PRIVATE lib_utils)
 target_link_libraries(GfxTest PRIVATE Catch2::Catch2WithMain)

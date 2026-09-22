@@ -2,6 +2,7 @@
 
 #include "../../strategy/abstract/StrategyStorage.h"
 #include "../Shape.h"
+#include "../observe/picture/PictureEvent.h"
 #include "../shapeStorage/IShapeStorage.h"
 
 namespace model {
@@ -20,6 +21,8 @@ namespace model {
         auto strategy = GetExistingStrategy(shapeType, args);
         const auto shape = std::make_shared<Shape>(id, color, std::move(strategy));
         m_shapeStorage->Store(shape);
+
+        shape->Subscribe(this);
     }
 
     void Picture::MoveShape(const std::string &id, double dx, double dy)
@@ -30,6 +33,9 @@ namespace model {
 
     void Picture::DeleteShape(const std::string &id)
     {
+        auto shape = GetExistingShape(id);
+        shape->Unsubscribe(this);
+
         m_shapeStorage->DeleteById(id);
     }
 
@@ -86,6 +92,31 @@ namespace model {
     {
         auto shapes = m_shapeStorage->GetAll();
         ShowShapes(shapes);
+    }
+
+    void Picture::OnShapeChange(const ShapeEvent &shapeEvent)
+    {
+        for (auto observer : m_pictureObservers) {
+            if (observer == nullptr) {
+                continue;
+            }
+            observer->OnChange(PictureEvent{
+                "Picture changed. " + shapeEvent.shapeId + ": " + shapeEvent.msg
+            });
+        }
+    }
+
+    void Picture::SubscribePictureObserver(IPictureObserver* pictureObserver)
+    {
+        auto it = std::find(m_pictureObservers.begin(), m_pictureObservers.end(), pictureObserver);
+        if (it == m_pictureObservers.end()) {
+            m_pictureObservers.emplace_back(pictureObserver);
+        }
+    }
+
+    void Picture::UnsubscribePictureObserver(IPictureObserver* pictureObserver)
+    {
+        std::erase(m_pictureObservers, pictureObserver);
     }
 
     std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)

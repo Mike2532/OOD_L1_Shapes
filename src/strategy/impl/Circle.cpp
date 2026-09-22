@@ -26,12 +26,17 @@ namespace strategy {
     }
 
     std::string Circle::GetArgsAsString() {
-        auto coords = pivotPoint.GetCoords();
-        return ConvertNumberToString(coords.first) + ' ' + ConvertNumberToString(coords.second) + ' ' + ConvertNumberToString(m_radius);
+        auto coords = GetCoords();
+        return coords + ' ' + ConvertNumberToString(m_radius);
     }
 
     std::string Circle::GetStrategyName() {
         return CircleStrategyName::GetStrategyName();
+    }
+
+    std::string Circle::GetCoords() {
+        auto coords = pivotPoint.GetCoords();
+        return ConvertNumberToString(coords.first) + ' ' + ConvertNumberToString(coords.second);
     }
 
     template class StrategyRegister<Circle, CircleStrategyName>;

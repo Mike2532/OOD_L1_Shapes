@@ -34,6 +34,14 @@ namespace strategy {
     }
 
     std::string Line::GetArgsAsString() {
+        return GetCoords();
+    }
+
+    std::string Line::GetStrategyName() {
+        return LineStrategyName::GetStrategyName();
+    }
+
+    std::string Line::GetCoords() {
         std::string result;
         auto vecticleSize = vertices.size();
         for (auto i = 0; i < vecticleSize; i++) {
@@ -45,10 +53,6 @@ namespace strategy {
             }
         }
         return result;
-    }
-
-    std::string Line::GetStrategyName() {
-        return LineStrategyName::GetStrategyName();
     }
 
     template class StrategyRegister<Line, LineStrategyName>;

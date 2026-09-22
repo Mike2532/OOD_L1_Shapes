@@ -25,6 +25,7 @@ namespace strategy {
 
         std::string GetStrategyName() override;
 
+        std::string GetCoords() override;
     private:
         static constexpr int TARGET_ARGUMENTS_SIZE = 3;
         Point pivotPoint;

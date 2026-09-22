@@ -26,6 +26,8 @@ namespace strategy {
         std::string GetArgsAsString() override;
 
         std::string GetStrategyName() override;
+
+        std::string GetCoords() override;
     private:
         static constexpr int TARGET_ARGUMENTS_SIZE = 4;
         std::vector<size_t> targetIndexes = {0, 2};
