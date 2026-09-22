@@ -14,6 +14,7 @@ namespace strategy {
     class StrategyStorage : public IStrategyStorage
     {
     public:
+        //todo можно возвращать nullptr
         std::optional<std::unique_ptr<IShapeStrategy>> Construct(const std::string& strategyName, const std::vector<std::string>& args)
         {
             if (storage.contains(strategyName)) {
