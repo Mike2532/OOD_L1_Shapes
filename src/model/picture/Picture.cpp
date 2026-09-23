@@ -116,7 +116,7 @@ namespace model {
         m_observerStorage.RemoveObserver(pictureObserver);
     }
 
-    std::shared_ptr<INotificationShape> Picture::GetExistingShape(const std::string &id)
+    std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)
     {
         auto shape = m_shapeStorage->GetById(id);
         if (shape.has_value()) {
@@ -144,7 +144,7 @@ namespace model {
         }
     }
 
-    void Picture::ShowShapes(const std::vector<std::shared_ptr<INotificationShape>> &shapes) {
+    void Picture::ShowShapes(const std::vector<std::shared_ptr<Shape>> &shapes) {
         while (m_canvas->IsActive()) {
             if (m_canvas->NeedToClose()) {
                 m_canvas->Close();

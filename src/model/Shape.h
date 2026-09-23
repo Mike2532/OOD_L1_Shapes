@@ -24,29 +24,48 @@ namespace model {
             RequireColorIsValid(m_color);
         }
 
-        std::string GetId() override
+        std::string GetId()
         {
             return m_shapeId;
         }
 
-        std::string GetColor() override
+        std::string GetColor()
         {
             return m_color;
         }
 
-        void Draw(std::unique_ptr<gfx::ICanvas>& canvas) override
+        void Draw(std::unique_ptr<gfx::ICanvas>& canvas)
         {
             m_strategy->Draw(canvas, m_color);
         }
 
-        std::string GetArgsAsString() override
+        std::string GetArgsAsString()
         {
             return m_strategy->GetArgsAsString();
         }
 
-        std::string GetStrategyName() override
+        std::string GetStrategyName()
         {
             return m_strategy->GetStrategyName();
+        }
+
+        void SetColor(const std::string& color)
+        {
+            RequireColorIsValid(color);
+            m_color = color;
+            Notify(ShapeEventType::ColorChanged);
+        }
+
+        void SetStrategy(std::unique_ptr<strategy::IShapeStrategy> strategy)
+        {
+            m_strategy = std::move(strategy);
+            Notify(ShapeEventType::StrategyChanged);
+        }
+
+        void Move(double dx, double dy)
+        {
+            m_strategy->Move(dx, dy);
+            Notify(ShapeEventType::ShapeMoved);
         }
     private:
         const std::string m_shapeId;
@@ -58,22 +77,6 @@ namespace model {
             if (!std::regex_match(color, pattern)) {
                 throw std::invalid_argument("invalid color. Color must be format #rrggbb");
             }
-        }
-
-        void SetColorImpl(const std::string& color) override
-        {
-            RequireColorIsValid(color);
-            m_color = color;
-        }
-
-        void SetStrategyImpl(std::unique_ptr<strategy::IShapeStrategy> strategy) override
-        {
-            m_strategy = std::move(strategy);
-        }
-
-        void MoveImpl(double dx, double dy) override
-        {
-            m_strategy->Move(dx, dy);
         }
 
         ShapeEvent ConstructEvent(const ShapeEventType& event) override

@@ -6,7 +6,7 @@ namespace model {
     class ShapeStorage : public IShapeStorage
     {
     public:
-        std::optional<std::shared_ptr<INotificationShape>> GetById(const std::string &id) override
+        std::optional<std::shared_ptr<Shape>> GetById(const std::string &id) override
         {
             auto it = GetIteratorById(id);
             if (it != shapes.end()) {
@@ -15,12 +15,12 @@ namespace model {
             return std::nullopt;
         }
 
-        void Store(std::shared_ptr<INotificationShape> shape) override
+        void Store(std::shared_ptr<Shape> shape) override
         {
             shapes.push_back(shape);
         }
 
-        std::vector<std::shared_ptr<INotificationShape>> GetAll() override
+        std::vector<std::shared_ptr<Shape>> GetAll() override
         {
             return shapes;
         }
@@ -34,9 +34,9 @@ namespace model {
             }
         }
     private:
-        std::vector<std::shared_ptr<INotificationShape>> shapes;
+        std::vector<std::shared_ptr<Shape>> shapes;
 
-        std::__wrap_iter<std::shared_ptr<INotificationShape> *> GetIteratorById(const std::string &id)
+        std::__wrap_iter<std::shared_ptr<Shape> *> GetIteratorById(const std::string &id)
         {
             return std::find_if(shapes.begin(), shapes.end(), [id](const auto& shape) {
                 return shape->GetId() == id;

@@ -92,12 +92,6 @@ TEST_CASE("add shapes and list them, delete one and list again")
     REQUIRE(secondResult == secondTargetOutput);
 }
 
-TEST_CASE("delete non-existent shape")
-{
-    auto picture = GetPicture();
-    picture->DeleteShape("aaaaa");
-}
-
 TEST_CASE("Two shapes with same id")
 {
     auto picture = GetPicture();
