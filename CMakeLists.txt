@@ -32,18 +32,18 @@ target_link_libraries(PictureTest PRIVATE lib_utils)
 target_link_libraries(PictureTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(PictureTest PRIVATE "LINKER:-all_load")
 
-add_executable(GfxTest src/gfx/impl/test/Test.cpp
-        src/gfx/abstract/ICanvas.h
-        src/parser/Parser.cpp
-        src/parser/Parser.h
-        src/model/observe/shape/IShapeObserver.h
-        src/model/observe/shape/ShapeEvent.h
-        src/model/observe/shape/INotificationShape.h
-        src/model/observe/picture/IPictureObserver.h
-        src/model/observe/picture/PictureEvent.h
-        src/model/observe/picture/PictureObserver.h
-)
+add_executable(GfxTest src/gfx/impl/test/Test.cpp)
 target_link_libraries(GfxTest PRIVATE lib_utils)
 target_link_libraries(GfxTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(GfxTest PRIVATE "LINKER:-all_load")
 
+add_executable(PictureObserverTest src/model/observe/picture/test/Test.cpp)
+target_link_libraries(PictureObserverTest PRIVATE lib_utils)
+target_link_libraries(PictureObserverTest PRIVATE Catch2::Catch2WithMain)
+target_link_options(PictureObserverTest PRIVATE "LINKER:-all_load")
+
+add_executable(ShapeObserverTest src/model/observe/shape/test/Test.cpp
+        src/model/observe/shape/test/TestShapeObserver.h)
+target_link_libraries(ShapeObserverTest PRIVATE lib_utils)
+target_link_libraries(ShapeObserverTest PRIVATE Catch2::Catch2WithMain)
+target_link_options(ShapeObserverTest PRIVATE "LINKER:-all_load")

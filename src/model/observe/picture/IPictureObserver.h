@@ -3,11 +3,13 @@
 
 #include "PictureEvent.h"
 
-class IPictureObserver
-{
-public:
-    virtual ~IPictureObserver() = default;
-    virtual void OnChange(const PictureEvent& event) = 0;
-};
+namespace model {
+    class IPictureObserver
+    {
+    public:
+        virtual ~IPictureObserver() = default;
+        virtual void OnChange(const PictureEvent& event) = 0;
+    };
+}
 
 #endif //OOD_L1_SHAPES_IPICTUREOBSERVER_H

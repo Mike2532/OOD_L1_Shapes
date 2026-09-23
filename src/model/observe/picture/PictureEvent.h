@@ -3,9 +3,11 @@
 
 #include <string>
 
-struct PictureEvent
-{
-    const std::string msg;
-};
+namespace model {
+    struct PictureEvent
+    {
+        const std::string msg;
+    };
+}
 
 #endif //OOD_L1_SHAPES_PICTUREEVENT_H

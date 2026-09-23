@@ -43,11 +43,11 @@ namespace model {
 
         std::vector<IPictureObserver*> m_pictureObservers;
 
-
-        std::shared_ptr<Shape> GetExistingShape(const std::string &id);
+        std::shared_ptr<INotificationShape> GetExistingShape(const std::string &id);
         std::unique_ptr<strategy::IShapeStrategy> GetExistingStrategy(const std::string& shapeType, const std::vector<std::string>& args);
         void RequireShapeDoesNotExist(const std::string& id);
-        void ShowShapes(const std::vector<std::shared_ptr<Shape>>& shapes);
+        void ShowShapes(const std::vector<std::shared_ptr<INotificationShape>>& shapes);
+        void NotifyPicturesObservers(const std::string& msg);
     };
 }
 

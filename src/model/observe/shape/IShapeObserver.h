@@ -2,11 +2,13 @@
 #define OOD_L1_SHAPES_ISHAPEOBSERVER_H
 #include "ShapeEvent.h"
 
-class IShapeObserver
-{
-public:
-    virtual ~IShapeObserver() = default;
-    virtual void OnShapeChange(const ShapeEvent& shapeEvent) = 0;
-};
+namespace model {
+    class IShapeObserver
+    {
+    public:
+        virtual ~IShapeObserver() = default;
+        virtual void OnShapeChange(const ShapeEvent& shapeEvent) = 0;
+    };
+}
 
 #endif //OOD_L1_SHAPES_ISHAPEOBSERVER_H

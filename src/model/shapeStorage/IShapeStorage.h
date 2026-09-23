@@ -11,9 +11,9 @@ namespace model {
     public:
         virtual ~IShapeStorage() = default;
 
-        virtual std::optional<std::shared_ptr<Shape>> GetById(const std::string& id) = 0;
-        virtual std::vector<std::shared_ptr<Shape>> GetAll() = 0;
-        virtual void Store(std::shared_ptr<Shape> shape) = 0;
+        virtual std::optional<std::shared_ptr<INotificationShape>> GetById(const std::string& id) = 0;
+        virtual std::vector<std::shared_ptr<INotificationShape>> GetAll() = 0;
+        virtual void Store(std::shared_ptr<INotificationShape> shape) = 0;
         virtual void DeleteById(const std::string& id) = 0;
     };
 }

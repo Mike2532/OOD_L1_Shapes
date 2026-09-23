@@ -5,64 +5,66 @@
 #include "../../../strategy/abstract/IShapeStrategy.h"
 #include "IShapeObserver.h"
 
-class INotificationShape
-{
-public:
-    virtual ~INotificationShape() = default;
-
-    virtual std::string GetId() = 0;
-
-    virtual std::string GetColor() = 0;
-
-    virtual void Draw(std::unique_ptr<gfx::ICanvas>& canvas) = 0;
-
-    virtual std::string GetArgsAsString() = 0;
-
-    virtual std::string GetStrategyName() = 0;
-
-    void Subscribe(IShapeObserver* observer)
+namespace model {
+    class INotificationShape
     {
-        auto it = std::find(m_observers.begin(), m_observers.end(), observer);
-        if (it == m_observers.end()) {
-            m_observers.emplace_back(observer);
-        }
-    }
+    public:
+        virtual ~INotificationShape() = default;
 
-    void Unsubscribe(IShapeObserver* observer)
-    {
-        std::erase(m_observers, observer);
-    }
+        virtual std::string GetId() = 0;
 
-    void SetColor(const std::string& color) {
-        Notify(ShapeEventType::ColorChanged);
-        SetColorImpl(color);
-    }
+        virtual std::string GetColor() = 0;
 
-    void SetStrategy(std::unique_ptr<strategy::IShapeStrategy> strategy) {
-        Notify(ShapeEventType::StrategyChanged);
-        SetStrategyImpl(std::move(strategy));
-    }
+        virtual void Draw(std::unique_ptr<gfx::ICanvas>& canvas) = 0;
 
-    void Move(const double dx, const double dy) {
-        Notify(ShapeEventType::ShapeMoved);
-        MoveImpl(dx, dy);
-    }
-private:
-    std::vector<IShapeObserver*> m_observers;
+        virtual std::string GetArgsAsString() = 0;
 
-    void Notify(const ShapeEventType& eventType) {
-        for (auto& observer : m_observers) {
-            if (observer != nullptr) {
-                observer->OnShapeChange(ConstructEvent(eventType));
+        virtual std::string GetStrategyName() = 0;
+
+        void Subscribe(IShapeObserver* observer)
+        {
+            auto it = std::find(m_observers.begin(), m_observers.end(), observer);
+            if (it == m_observers.end()) {
+                m_observers.emplace_back(observer);
             }
         }
-    }
 
-    virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;
+        void Unsubscribe(IShapeObserver* observer)
+        {
+            std::erase(m_observers, observer);
+        }
 
-    virtual void SetColorImpl(const std::string& color) = 0;
-    virtual void SetStrategyImpl(std::unique_ptr<strategy::IShapeStrategy> strategy) = 0;
-    virtual void MoveImpl(double dx, double dy) = 0;
-};
+        void SetColor(const std::string& color) {
+            SetColorImpl(color);
+            Notify(ShapeEventType::ColorChanged);
+        }
+
+        void SetStrategy(std::unique_ptr<strategy::IShapeStrategy> strategy) {
+            SetStrategyImpl(std::move(strategy));
+            Notify(ShapeEventType::StrategyChanged);
+        }
+
+        void Move(const double dx, const double dy) {
+            MoveImpl(dx, dy);
+            Notify(ShapeEventType::ShapeMoved);
+        }
+    private:
+        std::vector<IShapeObserver*> m_observers;
+
+        void Notify(const ShapeEventType& eventType) {
+            for (auto& observer : m_observers) {
+                if (observer != nullptr) {
+                    observer->OnShapeChange(ConstructEvent(eventType));
+                }
+            }
+        }
+
+        virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;
+
+        virtual void SetColorImpl(const std::string& color) = 0;
+        virtual void SetStrategyImpl(std::unique_ptr<strategy::IShapeStrategy> strategy) = 0;
+        virtual void MoveImpl(double dx, double dy) = 0;
+    };
+}
 
 #endif //OOD_L1_SHAPES_INOTIFICATEDSHAPE_H

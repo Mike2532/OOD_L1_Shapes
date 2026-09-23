@@ -23,6 +23,9 @@ namespace model {
         m_shapeStorage->Store(shape);
 
         shape->Subscribe(this);
+
+        std::string shapeAddedNotification = "Added " + id + " to Picture";
+        NotifyPicturesObservers(shapeAddedNotification);
     }
 
     void Picture::MoveShape(const std::string &id, double dx, double dy)
@@ -37,6 +40,9 @@ namespace model {
         shape->Unsubscribe(this);
 
         m_shapeStorage->DeleteById(id);
+
+        std::string shapeRemovedNotification = "Removed " + id + " from Picture";
+        NotifyPicturesObservers(shapeRemovedNotification);
     }
 
     void Picture::ChangeColor(const std::string &id, const std::string &color)
@@ -96,14 +102,8 @@ namespace model {
 
     void Picture::OnShapeChange(const ShapeEvent &shapeEvent)
     {
-        for (auto observer : m_pictureObservers) {
-            if (observer == nullptr) {
-                continue;
-            }
-            observer->OnChange(PictureEvent{
-                "Picture changed. " + shapeEvent.shapeId + ": " + shapeEvent.msg
-            });
-        }
+        std::string notificationMsg = "Picture changed. " + shapeEvent.shapeId + ": " + shapeEvent.msg;
+        NotifyPicturesObservers(notificationMsg);
     }
 
     void Picture::SubscribePictureObserver(IPictureObserver* pictureObserver)
@@ -119,7 +119,7 @@ namespace model {
         std::erase(m_pictureObservers, pictureObserver);
     }
 
-    std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)
+    std::shared_ptr<INotificationShape> Picture::GetExistingShape(const std::string &id)
     {
         auto shape = m_shapeStorage->GetById(id);
         if (shape.has_value()) {
@@ -147,7 +147,7 @@ namespace model {
         }
     }
 
-    void Picture::ShowShapes(const std::vector<std::shared_ptr<Shape>> &shapes) {
+    void Picture::ShowShapes(const std::vector<std::shared_ptr<INotificationShape>> &shapes) {
         while (m_canvas->IsActive()) {
             if (m_canvas->NeedToClose()) {
                 m_canvas->Close();
@@ -160,6 +160,15 @@ namespace model {
             }
 
             m_canvas->Display();
+        }
+    }
+
+    void Picture::NotifyPicturesObservers(const std::string& msg) {
+        for (auto observer : m_pictureObservers) {
+            if (observer == nullptr) {
+                continue;
+            }
+            observer->OnChange(PictureEvent{msg});
         }
     }
 }
