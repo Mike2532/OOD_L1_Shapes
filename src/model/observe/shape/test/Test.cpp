@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
+#include "CallbackTestObserver.h"
 #include "TestShapeObserver.h"
 #include "../../../Shape.h"
 #include "../../../../strategy/impl/Rectangle.h"
@@ -115,3 +116,47 @@ TEST_CASE("An unsuccessful operation that does not change the state of the objec
     RequireEmptyObserver(&shapeObserver);
 }
 
+TEST_CASE("unsubscribe one of observers during notifications")
+{
+    auto testShape = GetTestShape();
+
+    auto callbackObserver = CallbackTestObserver();
+    auto secondCallbackObserver = CallbackTestObserver();
+    auto thirdCallbackObserver = CallbackTestObserver();
+
+    testShape.Subscribe(&callbackObserver);
+    testShape.Subscribe(&secondCallbackObserver);
+    testShape.Subscribe(&thirdCallbackObserver);
+
+    callbackObserver.SetExecutable([&testShape, &secondCallbackObserver] () {
+        testShape.Unsubscribe(&secondCallbackObserver);
+    });
+
+    testShape.Move(3, 4);
+
+    REQUIRE(callbackObserver.GetCallCount() == 1);
+    REQUIRE(secondCallbackObserver.GetCallCount() == 0);
+    REQUIRE(thirdCallbackObserver.GetCallCount() == 1);
+}
+
+TEST_CASE("add new observer during notifications")
+{
+    auto testShape = GetTestShape();
+
+    auto callbackObserver = CallbackTestObserver();
+    auto secondCallbackObserver = CallbackTestObserver();
+
+    testShape.Subscribe(&callbackObserver);
+
+    callbackObserver.SetExecutable([&testShape, &secondCallbackObserver] () {
+        testShape.Subscribe(&secondCallbackObserver);
+    });
+
+    testShape.Move(3, 4);
+    REQUIRE(callbackObserver.GetCallCount() == 1);
+    REQUIRE(secondCallbackObserver.GetCallCount() == 0);
+
+    testShape.Move(3, 4);
+    REQUIRE(callbackObserver.GetCallCount() == 2);
+    REQUIRE(secondCallbackObserver.GetCallCount() == 1);
+}

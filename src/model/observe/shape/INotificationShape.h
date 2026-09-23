@@ -3,6 +3,7 @@
 
 #include <string>
 #include "../../../strategy/abstract/IShapeStrategy.h"
+#include "../../observe/storage/ObserverStorage.h"
 #include "IShapeObserver.h"
 
 namespace model {
@@ -23,15 +24,12 @@ namespace model {
 
         void Subscribe(IShapeObserver* observer)
         {
-            auto it = std::find(m_observers.begin(), m_observers.end(), observer);
-            if (it == m_observers.end()) {
-                m_observers.emplace_back(observer);
-            }
+            m_observerStorage.AddObserver(observer);
         }
 
         void Unsubscribe(IShapeObserver* observer)
         {
-            std::erase(m_observers, observer);
+            m_observerStorage.RemoveObserver(observer);
         }
 
         void SetColor(const std::string& color) {
@@ -49,14 +47,20 @@ namespace model {
             Notify(ShapeEventType::ShapeMoved);
         }
     private:
-        std::vector<IShapeObserver*> m_observers;
+        ObserverStorage<IShapeObserver> m_observerStorage;
 
         void Notify(const ShapeEventType& eventType) {
-            for (auto& observer : m_observers) {
-                if (observer != nullptr) {
-                    observer->OnShapeChange(ConstructEvent(eventType));
+            const auto event = ConstructEvent(eventType);
+
+            auto observers = m_observerStorage.GetObservers();
+            for (const auto& observer : observers) {
+                if (observer->isRemoved || observer->observer == nullptr) {
+                    continue;
                 }
+                observer->observer->OnShapeChange(event);
             }
+
+            m_observerStorage.Unlock();
         }
 
         virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;

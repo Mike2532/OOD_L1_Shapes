@@ -108,15 +108,12 @@ namespace model {
 
     void Picture::SubscribePictureObserver(IPictureObserver* pictureObserver)
     {
-        auto it = std::find(m_pictureObservers.begin(), m_pictureObservers.end(), pictureObserver);
-        if (it == m_pictureObservers.end()) {
-            m_pictureObservers.emplace_back(pictureObserver);
-        }
+        m_observerStorage.AddObserver(pictureObserver);
     }
 
     void Picture::UnsubscribePictureObserver(IPictureObserver* pictureObserver)
     {
-        std::erase(m_pictureObservers, pictureObserver);
+        m_observerStorage.RemoveObserver(pictureObserver);
     }
 
     std::shared_ptr<INotificationShape> Picture::GetExistingShape(const std::string &id)
@@ -164,11 +161,13 @@ namespace model {
     }
 
     void Picture::NotifyPicturesObservers(const std::string& msg) {
-        for (auto observer : m_pictureObservers) {
-            if (observer == nullptr) {
+        auto observers = m_observerStorage.GetObservers();
+        for (const auto& observer : observers) {
+            if (observer->isRemoved || observer->observer == nullptr) {
                 continue;
             }
-            observer->OnChange(PictureEvent{msg});
+            observer->observer->OnChange(PictureEvent{msg});
         }
+        m_observerStorage.Unlock();
     }
 }

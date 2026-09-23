@@ -32,7 +32,8 @@ target_link_libraries(PictureTest PRIVATE lib_utils)
 target_link_libraries(PictureTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(PictureTest PRIVATE "LINKER:-all_load")
 
-add_executable(GfxTest src/gfx/impl/test/Test.cpp)
+add_executable(GfxTest src/gfx/impl/test/Test.cpp
+        src/model/observe/storage/ObserverStorage.h)
 target_link_libraries(GfxTest PRIVATE lib_utils)
 target_link_libraries(GfxTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(GfxTest PRIVATE "LINKER:-all_load")
@@ -43,7 +44,8 @@ target_link_libraries(PictureObserverTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(PictureObserverTest PRIVATE "LINKER:-all_load")
 
 add_executable(ShapeObserverTest src/model/observe/shape/test/Test.cpp
-        src/model/observe/shape/test/TestShapeObserver.h)
+        src/model/observe/shape/test/TestShapeObserver.h
+        src/model/observe/shape/test/CallbackTestObserver.h)
 target_link_libraries(ShapeObserverTest PRIVATE lib_utils)
 target_link_libraries(ShapeObserverTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(ShapeObserverTest PRIVATE "LINKER:-all_load")

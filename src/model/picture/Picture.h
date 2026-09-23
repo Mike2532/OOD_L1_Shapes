@@ -37,14 +37,13 @@ namespace model {
         void SubscribePictureObserver(IPictureObserver* pictureObserver);
         void UnsubscribePictureObserver(IPictureObserver* pictureObserver);
     private:
+        ObserverStorage<IPictureObserver> m_observerStorage;
         std::unique_ptr<IShapeStorage> m_shapeStorage;
         std::unique_ptr<strategy::IStrategyStorage> m_strategyStorage;
         std::unique_ptr<gfx::ICanvas> m_canvas;
-
-        std::vector<IPictureObserver*> m_pictureObservers;
-
         std::shared_ptr<INotificationShape> GetExistingShape(const std::string &id);
         std::unique_ptr<strategy::IShapeStrategy> GetExistingStrategy(const std::string& shapeType, const std::vector<std::string>& args);
+
         void RequireShapeDoesNotExist(const std::string& id);
         void ShowShapes(const std::vector<std::shared_ptr<INotificationShape>>& shapes);
         void NotifyPicturesObservers(const std::string& msg);
