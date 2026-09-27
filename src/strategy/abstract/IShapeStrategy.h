@@ -31,6 +31,13 @@ namespace strategy {
             }
         }
 
+        void RequireMinimalArguments(int minimalSize, const std::vector<std::string>& args)
+        {
+            if (args.size() < minimalSize) {
+                throw std::runtime_error("wrong number of arguments. Expected minimal: " + std::to_string(minimalSize) + " Foud: " + std::to_string(args.size()));
+            }
+        }
+
         std::string ConvertNumberToString(double number) const
         {
             return std::format("{:.2f}", number);;

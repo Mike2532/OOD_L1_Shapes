@@ -1,6 +1,8 @@
 #ifndef OOD_L1_SHAPES_POINT_H
 #define OOD_L1_SHAPES_POINT_H
 
+#include <utility>
+
 namespace strategy {
     class Point
     {

@@ -9,6 +9,13 @@
 #include "../../strategy/abstract/IStrategyStorage.h"
 #include "../shapeStorage/IShapeStorage.h"
 #include "../observe/picture/IPictureObserver.h"
+#include "commandData/AddShapeData.h"
+#include "commandData/ChangeColorData.h"
+#include "commandData/ChangeShapeData.h"
+#include "commandData/DeleteShapeData.h"
+#include "commandData/DrawShapeData.h"
+#include "commandData/MovePictureData.h"
+#include "commandData/MoveShapeData.h"
 
 namespace model {
     class Picture : public IShapeObserver
@@ -24,14 +31,14 @@ namespace model {
         {
         }
 
-        void AddShape(const std::string& id, std::string color, const std::string& shapeType, const std::vector<std::string>& args);
-        void MoveShape(const std::string& id, double dx, double dy);
-        void DeleteShape(const std::string& id);
-        void ChangeColor(const std::string& id, const std::string& color);
-        void ChangeShape(const std::string& id, const std::string& shapeType, const std::vector<std::string>& args);
-        void DrawShape(const std::string& id);
+        void AddShape(const AddShapeData& data);
+        void MoveShape(const MoveShapeData& data);
+        void DeleteShape(const DeleteShapeData& data);
+        void ChangeColor(const ChangeColorData& data);
+        void ChangeShape(const ChangeShapeData& data);
+        void DrawShape(const DrawShapeData& data);
         void List(std::ostream& output = std::cout);
-        void MovePicture(double dx, double dy);
+        void MovePicture(const MovePictureData& data);
         void DrawPicture();
         void OnShapeChange(const ShapeEvent &shapeEvent) override;
         void SubscribePictureObserver(IPictureObserver* pictureObserver);

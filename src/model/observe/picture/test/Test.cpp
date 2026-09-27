@@ -22,12 +22,13 @@ std::shared_ptr<model::Picture> GetPicture()
 void AddRectangle(std::shared_ptr<model::Picture> picture)
 {
     std::vector<std::string> rectangleArgs = {"1", "2", "3", "4"};
-    picture->AddShape(
+    auto data = AddShapeData(
         testPictureId,
         "#ffffff",
         "rectangle",
         rectangleArgs
     );
+    picture->AddShape(data);
 }
 
 TEST_CASE("default behavior")
@@ -42,13 +43,15 @@ TEST_CASE("default behavior")
     REQUIRE(output.str() == testPictureAddedMsg);
     output.str("");
 
-    picture->MoveShape(testPictureId, 3, 4);
+    auto mData = MoveShapeData(testPictureId, 3, 4);
+    picture->MoveShape(mData);
 
     std::string justCreatedTestShapeMovedMsg = "Picture changed. testId: shape testId change coords. New coords: 4.00 6.00\n";
     REQUIRE(output.str() == "Picture changed. testId: shape testId change coords. New coords: 4.00 6.00\n");
     output.str("");
 
-    picture->DeleteShape(testPictureId);
+    auto dData = DeleteShapeData(testPictureId);
+    picture->DeleteShape(dData);
     REQUIRE(output.str() == "Removed testId from Picture\n");
 }
 
@@ -97,6 +100,7 @@ TEST_CASE("unsubscribe")
 
     picture->UnsubscribePictureObserver(&pictureObserver);
 
-    picture->MoveShape(testPictureId, 3, 4);
+    auto data = MoveShapeData(testPictureId, 3, 4);
+    picture->MoveShape(data);
     REQUIRE(output.str() == "");
 }

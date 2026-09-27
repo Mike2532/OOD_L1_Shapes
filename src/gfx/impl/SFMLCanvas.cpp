@@ -29,7 +29,7 @@ namespace gfx {
         sf::RectangleShape line(sf::Vector2f(length, LINE_THICKNESS));
         line.setFillColor(m_color);
 
-        line.setOrigin(sf::Vector2f(0.0f, LINE_THICKNESS / 2));
+        line.setOrigin(sf::Vector2f(0.0f, LINE_THICKNESS / 2.0f));
         line.setPosition(m_drawPoint);
         line.setRotation(angle);
 

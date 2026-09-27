@@ -9,6 +9,7 @@
 #include "observe/shape/IShapeObserver.h"
 
 namespace model {
+//todo observableShape
     class Shape : public INotificationShape
     {
     public:

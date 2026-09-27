@@ -2,7 +2,7 @@
 
 namespace strategy {
     Text::Text(const std::vector<std::string> &args) {
-        RequireArgumentsSize(4, args);
+        RequireMinimalArguments(4, args);
 
         pivotPoint = Point(
             std::stod(args[0]),
@@ -12,7 +12,15 @@ namespace strategy {
         m_textSize = std::stod(args[2]);
         RequireNumberIsNonNegative("text size", m_textSize);
 
-        m_text = args[3];
+        std::string text;
+        auto argsSize = args.size();
+        for (int i = 3; i < argsSize; i++) {
+            text += args[i];
+            if (i != argsSize - 1) {
+                text += ' ';
+            }
+        }
+        m_text = text;
     }
 
     void Text::Move(double dx, double dy) {

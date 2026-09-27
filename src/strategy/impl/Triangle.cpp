@@ -27,6 +27,7 @@ namespace strategy {
 
     void Triangle::Draw(std::unique_ptr<gfx::ICanvas>& canvas, const std::string& color)
     {
+        canvas->SetColor(color);
         auto startCoords = vertices[0].GetCoords();
         canvas->MoveTo(startCoords.first, startCoords.second);
         canvas->LineTo(vertices[1].GetCoords().first, vertices[1].GetCoords().second);

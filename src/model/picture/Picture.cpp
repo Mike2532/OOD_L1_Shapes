@@ -4,66 +4,60 @@
 #include "../Shape.h"
 #include "../observe/picture/PictureEvent.h"
 #include "../shapeStorage/IShapeStorage.h"
+#include "commandData/AddShapeData.h"
+#include "commandData/MoveShapeData.h"
 
 namespace model {
-    void Picture::AddShape(
-        const std::string& id,
-        std::string color,
-        const std::string& shapeType,
-        const std::vector<std::string>& args
-    ) {
-        RequireShapeDoesNotExist(id);
+    void Picture::AddShape(const AddShapeData& data) {
+        RequireShapeDoesNotExist(data.id);
 
+        std::string color = data.color;
         std::transform(color.begin(), color.end(), color.begin(), [](unsigned char c) {
             return std::tolower(c);
         });
 
-        auto strategy = GetExistingStrategy(shapeType, args);
-        const auto shape = std::make_shared<Shape>(id, color, std::move(strategy));
+        auto strategy = GetExistingStrategy(data.shapeType, data.args);
+        const auto shape = std::make_shared<Shape>(data.id, color, std::move(strategy));
         m_shapeStorage->Store(shape);
 
         shape->Subscribe(this);
 
-        std::string shapeAddedNotification = "Added " + id + " to Picture";
+        std::string shapeAddedNotification = "Added " + data.id + " to Picture";
         NotifyPicturesObservers(shapeAddedNotification);
     }
 
-    void Picture::MoveShape(const std::string &id, double dx, double dy)
+    void Picture::MoveShape(const MoveShapeData& data)
     {
-        auto shape = GetExistingShape(id);
-        shape->Move(dx, dy);
+        auto shape = GetExistingShape(data.id);
+        shape->Move(data.dx, data.dy);
     }
 
-    void Picture::DeleteShape(const std::string &id)
+    void Picture::DeleteShape(const DeleteShapeData& data)
     {
-        auto shape = GetExistingShape(id);
+        auto shape = GetExistingShape(data.id);
         shape->Unsubscribe(this);
 
-        m_shapeStorage->DeleteById(id);
+        m_shapeStorage->DeleteById(data.id);
 
-        std::string shapeRemovedNotification = "Removed " + id + " from Picture";
+        std::string shapeRemovedNotification = "Removed " + data.id + " from Picture";
         NotifyPicturesObservers(shapeRemovedNotification);
     }
 
-    void Picture::ChangeColor(const std::string &id, const std::string &color)
+    void Picture::ChangeColor(const ChangeColorData& data)
     {
-        auto shape = GetExistingShape(id);
-        shape->SetColor(color);
+        auto shape = GetExistingShape(data.id);
+        shape->SetColor(data.color);
     }
 
-    void Picture::ChangeShape(
-        const std::string &id,
-        const std::string &shapeType,
-        const std::vector<std::string> &args
-    ) {
-        auto strategy = GetExistingStrategy(shapeType, args);
-        const auto shape = GetExistingShape(id);
+    void Picture::ChangeShape(const ChangeShapeData& data) {
+        auto strategy = GetExistingStrategy(data.shapeType, data.args);
+        const auto shape = GetExistingShape(data.id);
         shape->SetStrategy(std::move(strategy));
     }
 
-    void Picture::DrawShape(const std::string &id)
+    void Picture::DrawShape(const DrawShapeData& data)
     {
-        auto shape = GetExistingShape(id);
+        auto shape = GetExistingShape(data.id);
         ShowShapes({shape});
     }
 
@@ -86,11 +80,11 @@ namespace model {
         output << result;
     }
 
-    void Picture::MovePicture(double dx, double dy)
+    void Picture::MovePicture(const MovePictureData& data)
     {
         auto shapes = m_shapeStorage->GetAll();
         for (const auto& shape : shapes) {
-            shape->Move(dx, dy);
+            shape->Move(data.dx, data.dy);
         }
     }
 

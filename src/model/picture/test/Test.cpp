@@ -54,8 +54,9 @@ TEST_CASE("wrong color format")
     std::string firstShapeType = "circle";
     std::vector<std::string> firstShapeArgs{"1", "2","3"};
 
+    auto data = AddShapeData(fistShapeId, wrongColor, firstShapeType, firstShapeArgs);
     REQUIRE_THROWS_MATCHES(
-        picture->AddShape(fistShapeId, wrongColor, firstShapeType, firstShapeArgs),
+        picture->AddShape(data),
         std::invalid_argument,
         Catch::Matchers::Message("invalid color. Color must be format #rrggbb")
     );
@@ -70,12 +71,14 @@ TEST_CASE("add shapes and list them, delete one and list again")
     std::string fistShapeId = "fistShapeId";
     std::string firstShapeType = "circle";
     std::vector<std::string> firstShapeArgs{"1", "2","3"};
-    picture->AddShape(fistShapeId, defaultColor, firstShapeType, firstShapeArgs);
+    auto dataOne = AddShapeData(fistShapeId, defaultColor, firstShapeType, firstShapeArgs);
+    picture->AddShape(dataOne);
 
     std::string secondShapeId = "secondShapeId";
     std::string secondShapeType = "rectangle";
     std::vector<std::string> secondShapeArgs{"1", "2","3", "4"};
-    picture->AddShape(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    auto dataTwo = AddShapeData(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    picture->AddShape(dataTwo);
 
     std::ostringstream output;
     picture->List(output);
@@ -83,7 +86,7 @@ TEST_CASE("add shapes and list them, delete one and list again")
     std::string targetOutput = "1 circle fistShapeId #ffffff 1.00 2.00 3.00\n2 rectangle secondShapeId #ffffff 1.00 2.00 3.00 4.00\n";
     REQUIRE(result == targetOutput);
 
-    picture->DeleteShape(fistShapeId);
+    picture->DeleteShape(DeleteShapeData(fistShapeId));
 
     std::ostringstream secondOutput;
     picture->List(secondOutput);
@@ -101,10 +104,11 @@ TEST_CASE("Two shapes with same id")
     std::string fistShapeId = "fistShapeId";
     std::string firstShapeType = "circle";
     std::vector<std::string> firstShapeArgs{"1", "2","3"};
-    picture->AddShape(fistShapeId, defaultColor, firstShapeType, firstShapeArgs);
+    auto data = AddShapeData(fistShapeId, defaultColor, firstShapeType, firstShapeArgs);
+    picture->AddShape(data);
 
     REQUIRE_THROWS_MATCHES(
-        picture->AddShape(fistShapeId, defaultColor, firstShapeType, firstShapeArgs),
+        picture->AddShape(data),
         std::runtime_error,
         Catch::Matchers::Message("shape with id fistShapeId already exists")
     );
@@ -119,9 +123,10 @@ TEST_CASE("move shape")
     std::string secondShapeId = "secondShapeId";
     std::string secondShapeType = "rectangle";
     std::vector<std::string> secondShapeArgs{"1", "2","3", "4"};
-    picture->AddShape(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    auto data = AddShapeData(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    picture->AddShape(data);
 
-    picture->MoveShape(secondShapeId, 3, 4);
+    picture->MoveShape(MoveShapeData(secondShapeId, 3, 4));
 
     std::ostringstream secondOutput;
     picture->List(secondOutput);
@@ -134,7 +139,7 @@ TEST_CASE("move non-existing shape")
 {
     auto picture = GetPicture();
     REQUIRE_THROWS_MATCHES(
-        picture->MoveShape("aaaaa", 3, 4),
+        picture->MoveShape(MoveShapeData("aaaaa", 3, 4)),
         std::runtime_error,
         Catch::Matchers::Message("can not get shape with id aaaaa")
     );
@@ -144,7 +149,7 @@ TEST_CASE("change color non-existing shape")
 {
     auto picture = GetPicture();
     REQUIRE_THROWS_MATCHES(
-        picture->ChangeColor("aaaaa", "#000000"),
+        picture->ChangeColor(ChangeColorData("aaaaa", "#000000")),
         std::runtime_error,
         Catch::Matchers::Message("can not get shape with id aaaaa")
     );
@@ -154,7 +159,7 @@ TEST_CASE("change startegy non-existing shape")
 {
     auto picture = GetPicture();
     REQUIRE_THROWS_MATCHES(
-        picture->ChangeShape("aaaaa", "circle", {"1", "2","3"}),
+        picture->ChangeShape(ChangeShapeData("aaaaa", "circle", {"1", "2","3"})),
         std::runtime_error,
         Catch::Matchers::Message("can not get shape with id aaaaa")
     );
@@ -164,7 +169,7 @@ TEST_CASE("draw non-existing shape")
 {
     auto picture = GetPicture();
     REQUIRE_THROWS_MATCHES(
-        picture->DrawShape("aaaaa"),
+        picture->DrawShape(DrawShapeData("aaaaa")),
         std::runtime_error,
         Catch::Matchers::Message("can not get shape with id aaaaa")
     );
@@ -179,14 +184,14 @@ TEST_CASE("move picture")
     std::string fistShapeId = "fistShapeId";
     std::string firstShapeType = "circle";
     std::vector<std::string> firstShapeArgs{"1", "2","3"};
-    picture->AddShape(fistShapeId, defaultColor, firstShapeType, firstShapeArgs);
+    picture->AddShape(AddShapeData(fistShapeId, defaultColor, firstShapeType, firstShapeArgs));
 
     std::string secondShapeId = "secondShapeId";
     std::string secondShapeType = "rectangle";
     std::vector<std::string> secondShapeArgs{"1", "2","3", "4"};
-    picture->AddShape(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    picture->AddShape(AddShapeData(secondShapeId, defaultColor, secondShapeType, secondShapeArgs));
 
-    picture->MovePicture(3, 4);
+    picture->MovePicture(MovePictureData(3, 4));
 
     std::ostringstream secondOutput;
     picture->List(secondOutput);
@@ -204,10 +209,10 @@ TEST_CASE("change shape color")
     std::string secondShapeId = "secondShapeId";
     std::string secondShapeType = "rectangle";
     std::vector<std::string> secondShapeArgs{"1", "2","3", "4"};
-    picture->AddShape(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    picture->AddShape(AddShapeData(secondShapeId, defaultColor, secondShapeType, secondShapeArgs));
 
     std::string newColor = "#dddddd";
-    picture->ChangeColor(secondShapeId, newColor);
+    picture->ChangeColor(ChangeColorData(secondShapeId, newColor));
 
     std::ostringstream secondOutput;
     picture->List(secondOutput);
@@ -225,11 +230,11 @@ TEST_CASE("change shape")
     std::string secondShapeId = "secondShapeId";
     std::string secondShapeType = "rectangle";
     std::vector<std::string> secondShapeArgs{"1", "2","3", "4"};
-    picture->AddShape(secondShapeId, defaultColor, secondShapeType, secondShapeArgs);
+    picture->AddShape(AddShapeData(secondShapeId, defaultColor, secondShapeType, secondShapeArgs));
 
     std::string firstShapeType = "circle";
     std::vector<std::string> firstShapeArgs{"1", "2","3"};
-    picture->ChangeShape(secondShapeId, firstShapeType, firstShapeArgs);
+    picture->ChangeShape(ChangeShapeData(secondShapeId, firstShapeType, firstShapeArgs));
 
     std::ostringstream secondOutput;
     picture->List(secondOutput);
@@ -253,9 +258,9 @@ TEST_CASE("draw shape by id")
     std::string fistShapeId = "fistShapeId";
     std::string firstShapeType = "circle";
     std::vector<std::string> firstShapeArgs{"100", "200","100"};
-    picture->AddShape(fistShapeId, firstColor, firstShapeType, firstShapeArgs);
+    picture->AddShape(AddShapeData(fistShapeId, firstColor, firstShapeType, firstShapeArgs));
 
-    picture->DrawShape(fistShapeId);
+    picture->DrawShape(DrawShapeData(fistShapeId));
 }
 
 TEST_CASE("draw all shape types")
@@ -269,40 +274,40 @@ TEST_CASE("draw all shape types")
 
     auto picture = GetPictureWithCanvas(window, font);
 
-     picture->AddShape(
+     picture->AddShape(AddShapeData(
          "shapeId",
          "#1f0ccc",
          "circle",
          {"100", "200","100"}
-     );
+     ));
 
-    picture->AddShape(
+    picture->AddShape(AddShapeData(
         "lineId",
         "#000000",
         "line",
 {"400", "400","600", "400"}
-    );
+    ));
 
-    picture->AddShape(
+    picture->AddShape(AddShapeData(
         "rectangleId",
         "#ff4400",
         "rectangle",
 {"300", "300","150", "220"}
-    );
+    ));
 
-    picture->AddShape(
+    picture->AddShape(AddShapeData(
         "textId",
         "#c8ff00",
         "text",
 {"0", "0","25", "hello world!"}
-    );
+    ));
 
-    picture->AddShape(
+    picture->AddShape(AddShapeData(
         "triangleId",
         "#9900ff",
         "triangle",
 {"10", "50","200", "30", "75", "75"}
-    );
+    ));
 
     picture->DrawPicture();
 }

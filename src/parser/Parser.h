@@ -4,88 +4,35 @@
 #include <sstream>
 
 #include "../model/picture/Picture.h"
+#include "dataConsturctor/DataConstructor.h"
+#include "exception/UnknownUserCommandException.h"
 
-class Parser
-{
-public:
-    Parser(std::unique_ptr<model::Picture> picture)
-        : m_picture(std::move(picture))
+namespace parser {
+    class Parser
     {
-    }
+        static constexpr auto ADD_SHAPE_COMMAND = "addshape";
+        static constexpr auto MOVE_SHAPE_COMMAND = "moveshape";
+        static constexpr auto MOVE_PICTURE_COMMAND = "movepicture";
+        static constexpr auto DELETE_SHAPE_COMMAND = "deleteshape";
+        static constexpr auto LIST_COMMAND = "list";
+        static constexpr auto CHANGE_COLOR_COMMAND = "changecolor";
+        static constexpr auto CHANGE_SHAPE_COMMAND = "changeshape";
+        static constexpr auto DRAW_SHAPE_COMMAND = "drawshape";
+        static constexpr auto DRAW_PICTURE_COMMAND = "drawpicture";
 
-    void ListenAndServe()
-    {
-        std::string userInput;
-        while (std::getline(std::cin, userInput)) {
-            if (userInput.empty()) {
-                continue;
-            }
-
-            std::stringstream stream(userInput);
-
-            std::string userCommand;
-            stream >> userCommand;
-
-            auto command = ParseCommand(userCommand);
-            if (!command.has_value()) {
-                std::cout << "unknown command" << std::endl;
-                continue;
-            }
-
-
+    public:
+        Parser(std::unique_ptr<model::Picture> picture)
+            : m_picture(std::move(picture))
+        {
         }
-    }
-private:
-    std::unique_ptr<model::Picture> m_picture;
 
-    enum class Command {
-        AddShape,
-        MoveShape,
-        MovePicture,
-        DeleteShape,
-        List,
-        ChangeColor,
-        ChangeShape,
-        DrawShape,
-        DrawPicture
+        void ListenAndServe();
+    private:
+        std::unique_ptr<model::Picture> m_picture;
+        DataConstructor m_dataConstructor = DataConstructor();
+
+        void ExecuteUserCommand(std::string userCommand, std::stringstream& input);
     };
-
-    std::optional<Command> ParseCommand(std::string userInput)
-    {
-        std::transform(userInput.begin(), userInput.end(), userInput.begin(), [](unsigned char c) {
-            return std::tolower(c);
-        });
-
-        if (userInput == "adddshape") {
-            return Command::AddShape;
-        }
-        if (userInput == "moveshape") {
-            return Command::MoveShape;
-        }
-        if (userInput == "movepicture") {
-            return Command::MovePicture;
-        }
-        if (userInput == "deleteshape") {
-            return Command::DeleteShape;
-        }
-        if (userInput == "list") {
-            return Command::List;
-        }
-        if (userInput == "changecolor") {
-            return Command::ChangeColor;
-        }
-        if (userInput == "changeshape") {
-            return Command::ChangeShape;
-        }
-        if (userInput == "drawshape") {
-            return Command::DrawShape;
-        }
-        if (userInput == "drawpicture") {
-            return Command::DrawPicture;
-        }
-        return std::nullopt;
-    }
-};
-
+}
 
 #endif //OOD_L1_SHAPES_PARSER_H

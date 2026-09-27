@@ -6,6 +6,7 @@
 namespace model {
     template <typename T>
     struct Observer {
+    //todo умные указатели
         T* observer;
         bool isRemoved;
     };
@@ -63,6 +64,7 @@ namespace model {
             }
         }
     private:
+    //todo без локов
         bool m_isLocked = false;
         std::vector<std::shared_ptr<Observer<T>>> m_observers;
         std::vector<T*> m_observersToAdd;
