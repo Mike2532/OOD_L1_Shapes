@@ -1,11 +1,12 @@
 #ifndef OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
 #define OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
-#include "../IShapeObserver.h"
 
-class TestShapeObserver : public model::IShapeObserver
+#include "../../storage/IObserverElem.h"
+
+class TestShapeObserver : public IObserverElem<model::ShapeEvent>
 {
 public:
-    void OnShapeChange(const model::ShapeEvent &shapeEvent) override
+    void OnChange(const model::ShapeEvent &shapeEvent) override
     {
         m_lastShapeId = shapeEvent.shapeId;
         m_lastShapeMsg = shapeEvent.msg;

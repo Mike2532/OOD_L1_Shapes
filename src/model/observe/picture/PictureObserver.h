@@ -4,11 +4,11 @@
 #include <iosfwd>
 #include <iostream>
 
-#include "IPictureObserver.h"
 #include "PictureEvent.h"
+#include "../storage/IObserverElem.h"
 
 namespace model {
-    class PictureObserver : public IPictureObserver
+    class PictureObserver : public IObserverElem<PictureEvent>
     {
     public:
         explicit PictureObserver(std::ostream& output = std::cout)

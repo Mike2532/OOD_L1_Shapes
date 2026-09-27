@@ -16,7 +16,7 @@ model::Shape GetTestShape() {
     };
 }
 
-void MoveJustInitedTestShape(model::Shape* testShape, TestShapeObserver* shapeObserver)
+void MoveJustInitedTestShape(model::Shape* testShape, const std::shared_ptr<TestShapeObserver>& shapeObserver)
 {
     testShape->Move(5, 6);
     REQUIRE(shapeObserver->GetLastShapeId() == "testId");
@@ -24,14 +24,14 @@ void MoveJustInitedTestShape(model::Shape* testShape, TestShapeObserver* shapeOb
     REQUIRE(shapeObserver->GetNotificationsCounter() == 1);
 }
 
-void ChangeTestShapeColorAfterMoving(model::Shape* testShape, TestShapeObserver* shapeObserver)
+void ChangeTestShapeColorAfterMoving(model::Shape* testShape, const std::shared_ptr<TestShapeObserver>& shapeObserver)
 {
     testShape->SetColor("#000000");
     REQUIRE(shapeObserver->GetLastShapeMsg() == "shape testId change color. New color: #000000");
     REQUIRE(shapeObserver->GetNotificationsCounter() == 2);
 }
 
-void RequireEmptyObserver(TestShapeObserver* shapeObserver)
+void RequireEmptyObserver(const std::shared_ptr<TestShapeObserver>& shapeObserver)
 {
     REQUIRE(shapeObserver->GetLastShapeId() == "");
     REQUIRE(shapeObserver->GetLastShapeMsg() == "");
@@ -42,70 +42,70 @@ TEST_CASE("observer empty init")
 {
     auto testShape = GetTestShape();
 
-    auto shapeObserver = TestShapeObserver();
-    testShape.Subscribe(&shapeObserver);
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    testShape.Subscribe(shapeObserver);
 
-    RequireEmptyObserver(&shapeObserver);
+    RequireEmptyObserver(shapeObserver);
 }
 
 TEST_CASE("base notifications scenario")
 {
     auto testShape = GetTestShape();
 
-    auto shapeObserver = TestShapeObserver();
-    testShape.Subscribe(&shapeObserver);
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    testShape.Subscribe(shapeObserver);
 
-    MoveJustInitedTestShape(&testShape, &shapeObserver);
+    MoveJustInitedTestShape(&testShape, shapeObserver);
 
-    ChangeTestShapeColorAfterMoving(&testShape, &shapeObserver);
+    ChangeTestShapeColorAfterMoving(&testShape, shapeObserver);
 
     std::vector<std::string> triangleArgs = {"1", "2", "3", "4", "5", "6"};
     testShape.SetStrategy(std::make_unique<strategy::Triangle>(triangleArgs));
-    REQUIRE(shapeObserver.GetLastShapeMsg() == "shape testId change stategy. New strategy: triangle");
-    REQUIRE(shapeObserver.GetNotificationsCounter() == 3);
+    REQUIRE(shapeObserver->GetLastShapeMsg() == "shape testId change stategy. New strategy: triangle");
+    REQUIRE(shapeObserver->GetNotificationsCounter() == 3);
 }
 
 TEST_CASE("double subscribe will produce one notification")
 {
     auto testShape = GetTestShape();
-    auto shapeObserver = TestShapeObserver();
-    testShape.Subscribe(&shapeObserver);
-    testShape.Subscribe(&shapeObserver);
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    testShape.Subscribe(shapeObserver);
+    testShape.Subscribe(shapeObserver);
 
-    MoveJustInitedTestShape(&testShape, &shapeObserver);
+    MoveJustInitedTestShape(&testShape, shapeObserver);
 }
 
 TEST_CASE("observer unsubsribe and will not get notifications")
 {
     auto testShape = GetTestShape();
-    auto shapeObserver = TestShapeObserver();
-    testShape.Subscribe(&shapeObserver);
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    testShape.Subscribe(shapeObserver);
 
-    MoveJustInitedTestShape(&testShape, &shapeObserver);
+    MoveJustInitedTestShape(&testShape, shapeObserver);
 
-    testShape.Unsubscribe(&shapeObserver);
+    testShape.Unsubscribe(shapeObserver);
 
-    MoveJustInitedTestShape(&testShape, &shapeObserver);
+    MoveJustInitedTestShape(&testShape, shapeObserver);
 }
 
 TEST_CASE("two observers get notifications")
 {
     auto testShape = GetTestShape();
-    auto shapeObserver = TestShapeObserver();
-    auto secondObserver = TestShapeObserver();
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    auto secondObserver = std::make_shared<TestShapeObserver>();
 
-    testShape.Subscribe(&shapeObserver);
-    testShape.Subscribe(&secondObserver);
+    testShape.Subscribe(shapeObserver);
+    testShape.Subscribe(secondObserver);
 
-    MoveJustInitedTestShape(&testShape, &shapeObserver);
-    ChangeTestShapeColorAfterMoving(&testShape, &secondObserver);
+    MoveJustInitedTestShape(&testShape, shapeObserver);
+    ChangeTestShapeColorAfterMoving(&testShape, secondObserver);
 }
 
 TEST_CASE("An unsuccessful operation that does not change the state of the object does not result in a notification")
 {
     auto testShape = GetTestShape();
-    auto shapeObserver = TestShapeObserver();
-    testShape.Subscribe(&shapeObserver);
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    testShape.Subscribe(shapeObserver);
 
     REQUIRE_THROWS_MATCHES(
         testShape.SetColor("invalid color"),
@@ -113,50 +113,50 @@ TEST_CASE("An unsuccessful operation that does not change the state of the objec
         Catch::Matchers::Message("invalid color. Color must be format #rrggbb")
     );
 
-    RequireEmptyObserver(&shapeObserver);
+    RequireEmptyObserver(shapeObserver);
 }
 
 TEST_CASE("unsubscribe one of observers during notifications")
 {
     auto testShape = GetTestShape();
 
-    auto callbackObserver = CallbackTestObserver();
-    auto secondCallbackObserver = CallbackTestObserver();
-    auto thirdCallbackObserver = CallbackTestObserver();
+    auto callbackObserver = std::make_shared<CallbackTestObserver>();
+    auto secondCallbackObserver = std::make_shared<CallbackTestObserver>();
+    auto thirdCallbackObserver = std::make_shared<CallbackTestObserver>();
 
-    testShape.Subscribe(&callbackObserver);
-    testShape.Subscribe(&secondCallbackObserver);
-    testShape.Subscribe(&thirdCallbackObserver);
+    testShape.Subscribe(callbackObserver);
+    testShape.Subscribe(secondCallbackObserver);
+    testShape.Subscribe(thirdCallbackObserver);
 
-    callbackObserver.SetExecutable([&testShape, &secondCallbackObserver] () {
-        testShape.Unsubscribe(&secondCallbackObserver);
+    callbackObserver->SetExecutable([&testShape, secondCallbackObserver] () {
+        testShape.Unsubscribe(secondCallbackObserver);
     });
 
     testShape.Move(3, 4);
 
-    REQUIRE(callbackObserver.GetCallCount() == 1);
-    REQUIRE(secondCallbackObserver.GetCallCount() == 0);
-    REQUIRE(thirdCallbackObserver.GetCallCount() == 1);
+    REQUIRE(callbackObserver->GetCallCount() == 1);
+    REQUIRE(secondCallbackObserver->GetCallCount() == 0);
+    REQUIRE(thirdCallbackObserver->GetCallCount() == 1);
 }
 
 TEST_CASE("add new observer during notifications")
 {
     auto testShape = GetTestShape();
 
-    auto callbackObserver = CallbackTestObserver();
-    auto secondCallbackObserver = CallbackTestObserver();
+    auto callbackObserver = std::make_shared<CallbackTestObserver>();
+    auto secondCallbackObserver = std::make_shared<CallbackTestObserver>();
 
-    testShape.Subscribe(&callbackObserver);
+    testShape.Subscribe(callbackObserver);
 
-    callbackObserver.SetExecutable([&testShape, &secondCallbackObserver] () {
-        testShape.Subscribe(&secondCallbackObserver);
+    callbackObserver->SetExecutable([&testShape, &secondCallbackObserver] () {
+        testShape.Subscribe(secondCallbackObserver);
     });
 
     testShape.Move(3, 4);
-    REQUIRE(callbackObserver.GetCallCount() == 1);
-    REQUIRE(secondCallbackObserver.GetCallCount() == 0);
+    REQUIRE(callbackObserver->GetCallCount() == 1);
+    REQUIRE(secondCallbackObserver->GetCallCount() == 0);
 
     testShape.Move(3, 4);
-    REQUIRE(callbackObserver.GetCallCount() == 2);
-    REQUIRE(secondCallbackObserver.GetCallCount() == 1);
+    REQUIRE(callbackObserver->GetCallCount() == 2);
+    REQUIRE(secondCallbackObserver->GetCallCount() == 1);
 }

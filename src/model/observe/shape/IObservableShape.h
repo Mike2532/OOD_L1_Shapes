@@ -1,8 +1,8 @@
 #ifndef OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 #define OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 
-#include "../../observe/storage/ObserverStorage.h"
 #include "IShapeObserver.h"
+#include "../storage/ObserverService.h"
 
 namespace model {
     class IObservableShape
@@ -10,31 +10,22 @@ namespace model {
     public:
         virtual ~IObservableShape() = default;
 
-        void Subscribe(IShapeObserver* observer)
+        void Subscribe(const std::weak_ptr<IObserverElem<ShapeEvent>>& observer)
         {
-            m_observerStorage.AddObserver(observer);
+            m_observerService.AddElement(observer);
         }
 
-        void Unsubscribe(IShapeObserver* observer)
+        void Unsubscribe(const std::weak_ptr<IObserverElem<ShapeEvent>>& observer)
         {
-            m_observerStorage.RemoveObserver(observer);
+            m_observerService.RemoveElement(observer);
         }
     protected:
         void Notify(const ShapeEventType& eventType) {
             const auto event = ConstructEvent(eventType);
-
-            auto observers = m_observerStorage.GetObservers();
-            for (const auto& observer : observers) {
-                if (observer->isRemoved || observer->observer == nullptr) {
-                    continue;
-                }
-                observer->observer->OnShapeChange(event);
-            }
-
-            m_observerStorage.Unlock();
+            m_observerService.NotifyAll(event);
         }
     private:
-        ObserverStorage<IShapeObserver> m_observerStorage;
+        ObserverService<ShapeEvent> m_observerService;
 
         virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;
     };

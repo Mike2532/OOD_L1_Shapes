@@ -20,9 +20,9 @@ namespace model {
         const auto shape = std::make_shared<Shape>(data.id, color, std::move(strategy));
         m_shapeStorage->Store(shape);
 
-        shape->Subscribe(this);
+        shape->Subscribe(shared_from_this());
 
-        std::string shapeAddedNotification = "Added " + data.id + " to Picture";
+        const std::string shapeAddedNotification = "Added " + data.id + " to Picture";
         NotifyPicturesObservers(shapeAddedNotification);
     }
 
@@ -35,7 +35,7 @@ namespace model {
     void Picture::DeleteShape(const DeleteShapeData& data)
     {
         auto shape = GetExistingShape(data.id);
-        shape->Unsubscribe(this);
+        shape->Unsubscribe(shared_from_this());
 
         m_shapeStorage->DeleteById(data.id);
 
@@ -94,20 +94,20 @@ namespace model {
         ShowShapes(shapes);
     }
 
-    void Picture::OnShapeChange(const ShapeEvent &shapeEvent)
+    void Picture::OnChange(const ShapeEvent &shapeEvent)
     {
         std::string notificationMsg = "Picture changed. " + shapeEvent.shapeId + ": " + shapeEvent.msg;
         NotifyPicturesObservers(notificationMsg);
     }
 
-    void Picture::SubscribePictureObserver(IPictureObserver* pictureObserver)
+    void Picture::SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& observer)
     {
-        m_observerStorage.AddObserver(pictureObserver);
+        m_observerService.AddElement(observer);
     }
 
-    void Picture::UnsubscribePictureObserver(IPictureObserver* pictureObserver)
+    void Picture::UnsubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver)
     {
-        m_observerStorage.RemoveObserver(pictureObserver);
+        m_observerService.RemoveElement(pictureObserver);
     }
 
     std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)
@@ -155,13 +155,7 @@ namespace model {
     }
 
     void Picture::NotifyPicturesObservers(const std::string& msg) {
-        auto observers = m_observerStorage.GetObservers();
-        for (const auto& observer : observers) {
-            if (observer->isRemoved || observer->observer == nullptr) {
-                continue;
-            }
-            observer->observer->OnChange(PictureEvent{msg});
-        }
-        m_observerStorage.Unlock();
+        const auto event = PictureEvent{msg};
+        m_observerService.NotifyAll(event);
     }
 }

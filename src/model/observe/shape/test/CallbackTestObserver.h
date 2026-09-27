@@ -2,12 +2,13 @@
 #define OOD_L1_SHAPES_CALLBACKTESTOBSERVER_H
 
 #include <functional>
-#include "../IShapeObserver.h"
+#include "../../storage/IObserverElem.h"
+#include "../ShapeEvent.h"
 
-class CallbackTestObserver : public model::IShapeObserver
+class CallbackTestObserver : public IObserverElem<model::ShapeEvent>
 {
 public:
-    void OnShapeChange(const model::ShapeEvent &shapeEvent) override {
+    void OnChange(const model::ShapeEvent &shapeEvent) override {
         m_callCount++;
         if (m_executable != nullptr) {
             m_executable();

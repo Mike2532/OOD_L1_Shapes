@@ -36,8 +36,9 @@ int main() {
 
     auto picture = GetPictureWithCanvas(window, font);
 
-    auto pictureObserver = model::PictureObserver();
-    picture->SubscribePictureObserver(&pictureObserver);
+
+    auto pictureObserver = std::make_shared<model::PictureObserver>();
+    picture->SubscribePictureObserver(pictureObserver);
 
     auto parser = parser::Parser(std::move(picture));
     parser.ListenAndServe();

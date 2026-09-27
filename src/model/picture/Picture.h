@@ -18,7 +18,7 @@
 #include "commandData/MoveShapeData.h"
 
 namespace model {
-    class Picture : public IShapeObserver
+    class Picture : public IObserverElem<ShapeEvent>, public std::enable_shared_from_this<Picture>
     {
     public:
         Picture(
@@ -40,11 +40,11 @@ namespace model {
         void List(std::ostream& output = std::cout);
         void MovePicture(const MovePictureData& data);
         void DrawPicture();
-        void OnShapeChange(const ShapeEvent &shapeEvent) override;
-        void SubscribePictureObserver(IPictureObserver* pictureObserver);
-        void UnsubscribePictureObserver(IPictureObserver* pictureObserver);
+        void OnChange(const ShapeEvent& shapeEvent) override;
+        void SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
+        void UnsubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
     private:
-        ObserverStorage<IPictureObserver> m_observerStorage;
+        ObserverService<PictureEvent> m_observerService;
         std::unique_ptr<IShapeStorage> m_shapeStorage;
         std::unique_ptr<strategy::IStrategyStorage> m_strategyStorage;
         std::unique_ptr<gfx::ICanvas> m_canvas;
