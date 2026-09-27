@@ -5,12 +5,11 @@
 
 #include "../gfx/abstract/ICanvas.h"
 #include "../strategy/abstract/IShapeStrategy.h"
-#include "observe/shape/INotificationShape.h"
+#include "observe/shape/IObservableShape.h"
 #include "observe/shape/IShapeObserver.h"
 
 namespace model {
-//todo observableShape
-    class Shape : public INotificationShape
+    class Shape : public IObservableShape
     {
     public:
         Shape(

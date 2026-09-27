@@ -25,9 +25,7 @@ std::unique_ptr<model::Picture> GetPictureWithCanvas(sf::RenderWindow& window, s
     );
 }
 
-//todo найти спискок команд для рисования домика
-
-//todo актуализировать тесты
+//todo у домика почему то земля и небо некорректно рисуется
 int main() {
     sf::RenderWindow window(sf::VideoMode({W, H}), "Shapes");
 

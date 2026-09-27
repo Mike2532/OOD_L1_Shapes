@@ -124,8 +124,8 @@ namespace model {
         const std::vector<std::string> &args
     ) {
         auto strategy = m_strategyStorage->Construct(shapeType, args);
-        if (strategy.has_value()) {
-            return std::move(strategy.value());
+        if (strategy != nullptr) {
+            return std::move(strategy);
         }
         throw std::runtime_error("unknown strategy");
     }

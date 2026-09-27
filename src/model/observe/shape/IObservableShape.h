@@ -1,16 +1,14 @@
 #ifndef OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 #define OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 
-#include <string>
-#include "../../../strategy/abstract/IShapeStrategy.h"
 #include "../../observe/storage/ObserverStorage.h"
 #include "IShapeObserver.h"
 
 namespace model {
-    class INotificationShape
+    class IObservableShape
     {
     public:
-        virtual ~INotificationShape() = default;
+        virtual ~IObservableShape() = default;
 
         void Subscribe(IShapeObserver* observer)
         {

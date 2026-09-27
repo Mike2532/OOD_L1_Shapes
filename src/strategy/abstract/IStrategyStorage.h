@@ -9,7 +9,7 @@ namespace strategy {
     {
     public:
         virtual ~IStrategyStorage() = default;
-        virtual std::optional<std::unique_ptr<IShapeStrategy>> Construct(const std::string& strategyName, const std::vector<std::string>& args) = 0;
+        virtual std::unique_ptr<IShapeStrategy> Construct(const std::string& strategyName, const std::vector<std::string>& args) = 0;
     };
 }
 
