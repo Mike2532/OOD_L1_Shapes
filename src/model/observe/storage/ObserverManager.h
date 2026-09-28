@@ -55,8 +55,7 @@ namespace model {
                 return;
             }
 
-            auto lastElem = m_elems.end();
-            --lastElem;
+            auto lastElem = std::prev(m_elems.end());
 
             for (auto it = m_elems.begin(); ; ++it) {
                 if (!it->isDeleted) {
