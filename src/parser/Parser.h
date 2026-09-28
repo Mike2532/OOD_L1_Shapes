@@ -21,14 +21,14 @@ namespace parser {
         static constexpr auto DRAW_PICTURE_COMMAND = "drawpicture";
 
     public:
-        Parser(std::unique_ptr<model::Picture> picture)
+        Parser(std::shared_ptr<model::Picture> picture)
             : m_picture(std::move(picture))
         {
         }
 
         void ListenAndServe();
     private:
-        std::unique_ptr<model::Picture> m_picture;
+        std::shared_ptr<model::Picture> m_picture;
         DataConstructor m_dataConstructor = DataConstructor();
 
         void ExecuteUserCommand(std::string userCommand, std::stringstream& input);

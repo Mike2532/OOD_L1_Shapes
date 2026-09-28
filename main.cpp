@@ -12,13 +12,13 @@ const unsigned W = 800;
 const unsigned H = 600;
 std::string fontPath = "/System/Library/Fonts/Helvetica.ttc";
 
-std::unique_ptr<model::Picture> GetPictureWithCanvas(sf::RenderWindow& window, sf::Font font)
+std::shared_ptr<model::Picture> GetPictureWithCanvas(sf::RenderWindow& window, sf::Font font)
 {
     auto canvas = std::make_unique<gfx::SFMLCanvas>(window, font);
 
     auto shapeStorage = std::make_unique<model::ShapeStorage>();
     auto strategyStorage = std::make_unique<strategy::StrategyStorage>();
-    return std::make_unique<model::Picture>(
+    return std::make_shared<model::Picture>(
         std::move(shapeStorage),
         std::move(strategyStorage),
         std::move(canvas)

@@ -1,0 +1,8 @@
+AddShape sh1 #8B0000 triangle 300.0 350.0 500.0 350.0 400.0 250.0
+AddShape sh2 #4A2E12 rectangle 380.0 430.0 40.0 70.0
+AddShape sh3 #228B22 circle 635.0 370.0 50.0
+AddShape sh4 #32CD32 line 0.0 500.0 800.0 500.0
+AddShape sh5 #000000 text 50.0 560.0 24.0 hello world!
+MoveShape sh1 40 20
+List
+DrawPicture
