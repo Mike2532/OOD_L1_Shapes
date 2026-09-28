@@ -71,7 +71,7 @@ namespace model {
             }
 
             m_elems.remove_if([](const StoredObserver<T>& element) {
-                return element.isDeleted || element.observer.lock();
+                return element.isDeleted || element.observer.expired();
             });
         }
 
