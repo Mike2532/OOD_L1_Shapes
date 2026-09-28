@@ -20,7 +20,8 @@ namespace model {
         const auto shape = std::make_shared<Shape>(data.id, color, std::move(strategy));
         m_shapeStorage->Store(shape);
 
-        shape->Subscribe(shared_from_this());
+        auto subscription = shape->Subscribe(shared_from_this());
+        m_subscriptions.push_back(std::move(subscription));
 
         const std::string shapeAddedNotification = "Added " + data.id + " to Picture";
         NotifyPicturesObservers(shapeAddedNotification);
@@ -34,8 +35,16 @@ namespace model {
 
     void Picture::DeleteShape(const DeleteShapeData& data)
     {
-        auto shape = GetExistingShape(data.id);
-        shape->Unsubscribe(shared_from_this());
+        const auto shape = GetExistingShape(data.id);
+        auto subscriptionId = shape->GetSubscriptionId();
+
+        const auto subscriptionIt = std::find_if(m_subscriptions.begin(), m_subscriptions.end(),
+            [subscriptionId] (const Subscription& subscription) {
+                return subscription.GetSubscriptionId() == subscriptionId;
+        });
+        if (subscriptionIt != m_subscriptions.end()) {
+            subscriptionIt->Unsubscribe();
+        }
 
         m_shapeStorage->DeleteById(data.id);
 
@@ -100,14 +109,16 @@ namespace model {
         NotifyPicturesObservers(notificationMsg);
     }
 
-    void Picture::SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& observer)
+    Subscription Picture::SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& observer)
     {
         m_observerService.AddElement(observer);
-    }
+        auto callback = [this, observer] () {
+            m_observerService.RemoveElement(observer);
+        };
+        const auto subscriptionId = SubscribeIdProvider::GetNextSubscribeId();
+        m_subscriptionId = subscriptionId;
 
-    void Picture::UnsubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver)
-    {
-        m_observerService.RemoveElement(pictureObserver);
+        return Subscription(callback, subscriptionId);
     }
 
     std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)

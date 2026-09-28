@@ -34,10 +34,10 @@ void AddRectangle(std::shared_ptr<model::Picture> picture)
 TEST_CASE("default behavior")
 {
     std::ostringstream output;
-    auto pictureObserver = model::PictureObserver(output);
+    auto pictureObserver = std::make_shared<model::PictureObserver>(output);
 
     auto picture = GetPicture();
-    picture->SubscribePictureObserver(&pictureObserver);
+    auto subscription = picture->SubscribePictureObserver(pictureObserver);
 
     AddRectangle(picture);
     REQUIRE(output.str() == testPictureAddedMsg);
@@ -58,14 +58,14 @@ TEST_CASE("default behavior")
 TEST_CASE("two subscribers")
 {
     std::ostringstream output;
-    auto pictureObserver = model::PictureObserver(output);
+    auto pictureObserver = std::make_shared<model::PictureObserver>(output);
 
     std::ostringstream secondOutput;
-    auto secondPictureObserver = model::PictureObserver(secondOutput);
+    auto secondPictureObserver = std::make_shared<model::PictureObserver>(secondOutput);
 
     auto picture = GetPicture();
-    picture->SubscribePictureObserver(&pictureObserver);
-    picture->SubscribePictureObserver(&secondPictureObserver);
+    auto subscription = picture->SubscribePictureObserver(pictureObserver);
+    auto secondSubscription = picture->SubscribePictureObserver(secondPictureObserver);
 
     AddRectangle(picture);
 
@@ -76,11 +76,11 @@ TEST_CASE("two subscribers")
 TEST_CASE("double subscribe, one notification")
 {
     std::ostringstream output;
-    auto pictureObserver = model::PictureObserver(output);
+    auto pictureObserver = std::make_shared<model::PictureObserver>(output);
 
     auto picture = GetPicture();
-    picture->SubscribePictureObserver(&pictureObserver);
-    picture->SubscribePictureObserver(&pictureObserver);
+    auto subscription = picture->SubscribePictureObserver(pictureObserver);
+    auto secondSubscription = picture->SubscribePictureObserver(pictureObserver);
 
     AddRectangle(picture);
     REQUIRE(output.str() == testPictureAddedMsg);
@@ -89,16 +89,16 @@ TEST_CASE("double subscribe, one notification")
 TEST_CASE("unsubscribe")
 {
     std::ostringstream output;
-    auto pictureObserver = model::PictureObserver(output);
+    auto pictureObserver = std::make_shared<model::PictureObserver>(output);
 
     auto picture = GetPicture();
-    picture->SubscribePictureObserver(&pictureObserver);
+    auto subscription = picture->SubscribePictureObserver(pictureObserver);
 
     AddRectangle(picture);
     REQUIRE(output.str() == testPictureAddedMsg);
     output.str("");
 
-    picture->UnsubscribePictureObserver(&pictureObserver);
+    subscription.Unsubscribe();
 
     auto data = MoveShapeData(testPictureId, 3, 4);
     picture->MoveShape(data);

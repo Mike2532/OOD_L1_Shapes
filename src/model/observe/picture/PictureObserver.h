@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "PictureEvent.h"
-#include "../storage/IObserverElem.h"
+#include "../IObserverElem.h"
 
 namespace model {
     class PictureObserver : public IObserverElem<PictureEvent>

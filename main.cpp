@@ -25,7 +25,6 @@ std::unique_ptr<model::Picture> GetPictureWithCanvas(sf::RenderWindow& window, s
     );
 }
 
-//todo у домика почему то земля и небо некорректно рисуется
 int main() {
     sf::RenderWindow window(sf::VideoMode({W, H}), "Shapes");
 
@@ -36,9 +35,8 @@ int main() {
 
     auto picture = GetPictureWithCanvas(window, font);
 
-
     auto pictureObserver = std::make_shared<model::PictureObserver>();
-    picture->SubscribePictureObserver(pictureObserver);
+    auto subscription = picture->SubscribePictureObserver(pictureObserver);
 
     auto parser = parser::Parser(std::move(picture));
     parser.ListenAndServe();

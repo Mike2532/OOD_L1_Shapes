@@ -41,15 +41,16 @@ namespace model {
         void MovePicture(const MovePictureData& data);
         void DrawPicture();
         void OnChange(const ShapeEvent& shapeEvent) override;
-        void SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
-        void UnsubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
+        Subscription SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
     private:
         ObserverManager<PictureEvent> m_observerService;
         std::unique_ptr<IShapeStorage> m_shapeStorage;
         std::unique_ptr<strategy::IStrategyStorage> m_strategyStorage;
         std::unique_ptr<gfx::ICanvas> m_canvas;
+        std::vector<Subscription> m_subscriptions;
         std::shared_ptr<Shape> GetExistingShape(const std::string &id);
         std::unique_ptr<strategy::IShapeStrategy> GetExistingStrategy(const std::string& shapeType, const std::vector<std::string>& args);
+        int m_subscriptionId;
 
         void RequireShapeDoesNotExist(const std::string& id);
         void ShowShapes(const std::vector<std::shared_ptr<Shape>>& shapes);

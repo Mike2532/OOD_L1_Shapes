@@ -43,7 +43,7 @@ TEST_CASE("observer empty init")
     auto testShape = GetTestShape();
 
     auto shapeObserver = std::make_shared<TestShapeObserver>();
-    testShape.Subscribe(shapeObserver);
+    auto subscription = testShape.Subscribe(shapeObserver);
 
     RequireEmptyObserver(shapeObserver);
 }
@@ -53,7 +53,7 @@ TEST_CASE("base notifications scenario")
     auto testShape = GetTestShape();
 
     auto shapeObserver = std::make_shared<TestShapeObserver>();
-    testShape.Subscribe(shapeObserver);
+    auto subscription = testShape.Subscribe(shapeObserver);
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
 
@@ -69,8 +69,8 @@ TEST_CASE("double subscribe will produce one notification")
 {
     auto testShape = GetTestShape();
     auto shapeObserver = std::make_shared<TestShapeObserver>();
-    testShape.Subscribe(shapeObserver);
-    testShape.Subscribe(shapeObserver);
+    auto subscription = testShape.Subscribe(shapeObserver);
+    auto secondSubscription = testShape.Subscribe(shapeObserver);
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
 }
@@ -79,11 +79,11 @@ TEST_CASE("observer unsubsribe and will not get notifications")
 {
     auto testShape = GetTestShape();
     auto shapeObserver = std::make_shared<TestShapeObserver>();
-    testShape.Subscribe(shapeObserver);
+    auto subscription = testShape.Subscribe(shapeObserver);
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
 
-    testShape.Unsubscribe(shapeObserver);
+    subscription.Unsubscribe();
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
 }
@@ -94,8 +94,8 @@ TEST_CASE("two observers get notifications")
     auto shapeObserver = std::make_shared<TestShapeObserver>();
     auto secondObserver = std::make_shared<TestShapeObserver>();
 
-    testShape.Subscribe(shapeObserver);
-    testShape.Subscribe(secondObserver);
+    auto subscription = testShape.Subscribe(shapeObserver);
+    auto secondSubscription = testShape.Subscribe(secondObserver);
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
     ChangeTestShapeColorAfterMoving(&testShape, secondObserver);
@@ -105,7 +105,7 @@ TEST_CASE("An unsuccessful operation that does not change the state of the objec
 {
     auto testShape = GetTestShape();
     auto shapeObserver = std::make_shared<TestShapeObserver>();
-    testShape.Subscribe(shapeObserver);
+    auto subscription = testShape.Subscribe(shapeObserver);
 
     REQUIRE_THROWS_MATCHES(
         testShape.SetColor("invalid color"),
@@ -124,12 +124,12 @@ TEST_CASE("unsubscribe one of observers during notifications")
     auto secondCallbackObserver = std::make_shared<CallbackTestObserver>();
     auto thirdCallbackObserver = std::make_shared<CallbackTestObserver>();
 
-    testShape.Subscribe(callbackObserver);
-    testShape.Subscribe(secondCallbackObserver);
-    testShape.Subscribe(thirdCallbackObserver);
+    auto firstSubscription = testShape.Subscribe(callbackObserver);
+    auto secondSubscription = testShape.Subscribe(secondCallbackObserver);
+    auto thirdSubscription = testShape.Subscribe(thirdCallbackObserver);
 
-    callbackObserver->SetExecutable([&testShape, secondCallbackObserver] () {
-        testShape.Unsubscribe(secondCallbackObserver);
+    callbackObserver->SetExecutable([&secondSubscription] () {
+        secondSubscription.Unsubscribe();
     });
 
     testShape.Move(3, 4);
@@ -146,10 +146,14 @@ TEST_CASE("add new observer during notifications")
     auto callbackObserver = std::make_shared<CallbackTestObserver>();
     auto secondCallbackObserver = std::make_shared<CallbackTestObserver>();
 
-    testShape.Subscribe(callbackObserver);
+    auto subscription = testShape.Subscribe(callbackObserver);
+    std::optional<model::Subscription> secondSubscription;
 
-    callbackObserver->SetExecutable([&testShape, &secondCallbackObserver] () {
-        testShape.Subscribe(secondCallbackObserver);
+    callbackObserver->SetExecutable([&testShape, &secondCallbackObserver, &secondSubscription] () {
+        if (secondSubscription.has_value()) {
+            return;
+        }
+        secondSubscription = std::move(testShape.Subscribe(secondCallbackObserver));
     });
 
     testShape.Move(3, 4);
@@ -159,4 +163,53 @@ TEST_CASE("add new observer during notifications")
     testShape.Move(3, 4);
     REQUIRE(callbackObserver->GetCallCount() == 2);
     REQUIRE(secondCallbackObserver->GetCallCount() == 1);
+}
+
+TEST_CASE("double unsubscribe is safe")
+{
+    auto testShape = GetTestShape();
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    auto subscription = testShape.Subscribe(shapeObserver);
+
+    MoveJustInitedTestShape(&testShape, shapeObserver);
+
+    subscription.Unsubscribe();
+    subscription.Unsubscribe();
+
+    MoveJustInitedTestShape(&testShape, shapeObserver);
+}
+
+TEST_CASE("dont get notifications after destroying notification object")
+{
+    auto testShape = GetTestShape();
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+
+    {
+        auto subscription = testShape.Subscribe(shapeObserver);
+        MoveJustInitedTestShape(&testShape, shapeObserver);
+    }
+
+    MoveJustInitedTestShape(&testShape, shapeObserver);
+}
+
+TEST_CASE("desctroying shape before subscription")
+{
+    std::optional<model::Subscription> subscription;
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    {
+        auto testShape = GetTestShape();
+        subscription = std::move(testShape.Subscribe(shapeObserver));
+    }
+    subscription->Unsubscribe();
+}
+
+TEST_CASE("move subscription with save connections")
+{
+    auto testShape = GetTestShape();
+    auto shapeObserver = std::make_shared<TestShapeObserver>();
+    auto subscription = testShape.Subscribe(shapeObserver);
+
+    auto secondSubscription = std::move(subscription);
+
+    MoveJustInitedTestShape(&testShape, shapeObserver);
 }

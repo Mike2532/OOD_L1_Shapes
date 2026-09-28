@@ -2,7 +2,7 @@
 #define OOD_L1_SHAPES_CALLBACKTESTOBSERVER_H
 
 #include <functional>
-#include "../../storage/IObserverElem.h"
+#include "../../IObserverElem.h"
 #include "../ShapeEvent.h"
 
 class CallbackTestObserver : public IObserverElem<model::ShapeEvent>

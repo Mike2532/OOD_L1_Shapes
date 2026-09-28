@@ -2,11 +2,11 @@
 #define OOD_L1_SHAPES_OBSERVERSTORAGETWO_H
 
 #include <list>
-#include "IObserverElem.h"
+#include "../IObserverElem.h"
 
 namespace model {
     template <typename T>
-    struct ObserverElem
+    struct StoredObserver
     {
         std::weak_ptr<IObserverElem<T>> observer;
         bool isDeleted = false;
@@ -71,13 +71,13 @@ namespace model {
                 }
             }
 
-            m_elems.remove_if([](const ObserverElem<T>& node) {
+            m_elems.remove_if([](const StoredObserver<T>& node) {
                 return node.isDeleted || node.observer.expired();
             });
         }
 
     private:
-        std::list<ObserverElem<T>> m_elems;
+        std::list<StoredObserver<T>> m_elems;
     };
 }
 

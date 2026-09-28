@@ -3,6 +3,8 @@
 
 #include "ShapeEvent.h"
 #include "../storage/ObserverManager.h"
+#include "../Subscription.h"
+#include "../../SubscribeIdProvider.h"
 
 namespace model {
     class IObservableShape
@@ -10,14 +12,21 @@ namespace model {
     public:
         virtual ~IObservableShape() = default;
 
-        void Subscribe(const std::weak_ptr<IObserverElem<ShapeEvent>>& observer)
+        Subscription Subscribe(const std::weak_ptr<IObserverElem<ShapeEvent>>& observer)
         {
             m_observerService.AddElement(observer);
+            auto callback = [this, observer] () {
+                m_observerService.RemoveElement(observer);
+            };
+            const auto subscriptionId = SubscribeIdProvider::GetNextSubscribeId();
+            m_subscriptionId = subscriptionId;
+
+            return Subscription(callback, subscriptionId);
         }
 
-        void Unsubscribe(const std::weak_ptr<IObserverElem<ShapeEvent>>& observer)
+        int GetSubscriptionId()
         {
-            m_observerService.RemoveElement(observer);
+            return m_subscriptionId;
         }
     protected:
         void Notify(const ShapeEventType& eventType) {
@@ -26,6 +35,7 @@ namespace model {
         }
     private:
         ObserverManager<ShapeEvent> m_observerService;
+        int m_subscriptionId;
 
         virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;
     };

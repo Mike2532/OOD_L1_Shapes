@@ -1,7 +1,7 @@
 #ifndef OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
 #define OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
 
-#include "../../storage/IObserverElem.h"
+#include "../../IObserverElem.h"
 
 class TestShapeObserver : public IObserverElem<model::ShapeEvent>
 {
