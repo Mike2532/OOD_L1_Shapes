@@ -6,7 +6,7 @@
 #include "../gfx/abstract/ICanvas.h"
 #include "../strategy/abstract/IShapeStrategy.h"
 #include "observe/shape/IObservableShape.h"
-#include "observe/shape/IShapeObserver.h"
+#include "observe/shape/ShapeEvent.h"
 
 namespace model {
     class Shape : public IObservableShape

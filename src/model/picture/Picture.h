@@ -8,7 +8,6 @@
 #include "../../gfx/abstract/ICanvas.h"
 #include "../../strategy/abstract/IStrategyStorage.h"
 #include "../shapeStorage/IShapeStorage.h"
-#include "../observe/picture/IPictureObserver.h"
 #include "commandData/AddShapeData.h"
 #include "commandData/ChangeColorData.h"
 #include "commandData/ChangeShapeData.h"
@@ -16,6 +15,7 @@
 #include "commandData/DrawShapeData.h"
 #include "commandData/MovePictureData.h"
 #include "commandData/MoveShapeData.h"
+#include "../observe/picture/PictureEvent.h"
 
 namespace model {
     class Picture : public IObserverElem<ShapeEvent>, public std::enable_shared_from_this<Picture>
@@ -44,7 +44,7 @@ namespace model {
         void SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
         void UnsubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
     private:
-        ObserverService<PictureEvent> m_observerService;
+        ObserverManager<PictureEvent> m_observerService;
         std::unique_ptr<IShapeStorage> m_shapeStorage;
         std::unique_ptr<strategy::IStrategyStorage> m_strategyStorage;
         std::unique_ptr<gfx::ICanvas> m_canvas;

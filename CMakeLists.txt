@@ -44,7 +44,7 @@ add_executable(GfxTest src/gfx/impl/test/Test.cpp
         src/parser/dataConsturctor/DataConstructor.h
         src/parser/exception/UnknownUserCommandException.h
         src/parser/Parser.cpp
-        src/model/observe/storage/ObserverService.h
+        src/model/observe/storage/ObserverManager.h
         src/model/observe/storage/IObserverElem.h
 )
 target_link_libraries(GfxTest PRIVATE lib_utils)

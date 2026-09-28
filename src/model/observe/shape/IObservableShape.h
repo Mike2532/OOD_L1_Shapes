@@ -1,8 +1,8 @@
 #ifndef OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 #define OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 
-#include "IShapeObserver.h"
-#include "../storage/ObserverService.h"
+#include "ShapeEvent.h"
+#include "../storage/ObserverManager.h"
 
 namespace model {
     class IObservableShape
@@ -25,7 +25,7 @@ namespace model {
             m_observerService.NotifyAll(event);
         }
     private:
-        ObserverService<ShapeEvent> m_observerService;
+        ObserverManager<ShapeEvent> m_observerService;
 
         virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;
     };
