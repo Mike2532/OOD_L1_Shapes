@@ -34,9 +34,23 @@ int main() {
     }
 
     auto picture = GetPictureWithCanvas(window, font);
-
     auto pictureObserver = std::make_shared<model::PictureObserver>();
-    auto subscription = picture->SubscribePictureObserver(pictureObserver);
+
+    auto removedSubscription = picture->SubscribeToShapeRemoved([&pictureObserver](const model::ShapeRemovedEvent& event) {
+        pictureObserver->OnShapeRemoved(event);
+    });
+    auto addedSubscription = picture->SubscribeToShapeAdded([&pictureObserver](const model::ShapeAddedEvent& event) {
+        pictureObserver->OnShapeAdded(event);
+    });
+    auto movedSubscription = picture->SubscribeToMove([&pictureObserver](const model::ShapeMovedEvent& event) {
+        pictureObserver->OnShapeMoved(event);
+    });
+    auto changeStrategySubscription = picture->SubscribeToChangedStrategy([&pictureObserver](const model::ShapeChangedStrategyEvent& event) {
+        pictureObserver->OnShapeChangedStrategy(event);
+    });
+    auto changeColorSubscription = picture->SubscribeToChangedColor([&pictureObserver](const model::ShapeChangedColorEvent& event) {
+        pictureObserver->OnShapeChangedColor(event);
+    });
 
     auto parser = parser::Parser(std::move(picture));
     parser.ListenAndServe();

@@ -20,11 +20,22 @@ namespace model {
         const auto shape = std::make_shared<Shape>(data.id, color, std::move(strategy));
         m_shapeStorage->Store(shape);
 
-        auto subscription = shape->Subscribe(shared_from_this());
-        m_subscriptions.push_back(std::move(subscription));
+        auto moveSubscription = shape->SubscribeToMove([this](const ShapeMovedEvent& event) {
+            OnShapeMoved(event);
+        });
+        m_subscriptions.push_back(std::move(moveSubscription));
 
-        const std::string shapeAddedNotification = "Added " + data.id + " to Picture";
-        NotifyPicturesObservers(shapeAddedNotification);
+        auto changeStrategySubscription = shape->SubscribeToChangedStrategy([this](const ShapeChangedStrategyEvent& event) {
+            OnShapeChangedStrategy(event);
+        });
+        m_subscriptions.push_back(std::move(changeStrategySubscription));
+
+        auto changeColorSubscription = shape->SubscribeToChangedColor([this](const ShapeChangedColorEvent& event) {
+            OnShapeChangedColor(event);
+        });
+        m_subscriptions.push_back(std::move(changeColorSubscription));
+
+        m_shapeAddedSignal.NotifyAll(ShapeAddedEvent(data.id));
     }
 
     void Picture::MoveShape(const MoveShapeData& data)
@@ -36,20 +47,21 @@ namespace model {
     void Picture::DeleteShape(const DeleteShapeData& data)
     {
         const auto shape = GetExistingShape(data.id);
-        auto subscriptionId = shape->GetSubscriptionId();
+        auto subscriptionIds = shape->GetSubscriptionIds();
 
-        const auto subscriptionIt = std::find_if(m_subscriptions.begin(), m_subscriptions.end(),
-            [subscriptionId] (const Subscription& subscription) {
-                return subscription.GetSubscriptionId() == subscriptionId;
-        });
-        if (subscriptionIt != m_subscriptions.end()) {
-            subscriptionIt->Unsubscribe();
+        for (const auto& subscriptionId : subscriptionIds) {
+            const auto subscriptionIt = std::find_if(m_subscriptions.begin(), m_subscriptions.end(),
+                [subscriptionId] (const Subscription& subscription) {
+                    return subscription.GetSubscriptionId() == subscriptionId;
+            });
+            if (subscriptionIt != m_subscriptions.end()) {
+                subscriptionIt->Unsubscribe();
+            }
         }
 
         m_shapeStorage->DeleteById(data.id);
 
-        std::string shapeRemovedNotification = "Removed " + data.id + " from Picture";
-        NotifyPicturesObservers(shapeRemovedNotification);
+        m_shapeRemovedSignal.NotifyAll(ShapeRemovedEvent(data.id));
     }
 
     void Picture::ChangeColor(const ChangeColorData& data)
@@ -103,22 +115,24 @@ namespace model {
         ShowShapes(shapes);
     }
 
-    void Picture::OnChange(const ShapeEvent &shapeEvent)
-    {
-        std::string notificationMsg = "Picture changed. " + shapeEvent.shapeId + ": " + shapeEvent.msg;
-        NotifyPicturesObservers(notificationMsg);
+    Subscription Picture::SubscribeToShapeRemoved(const std::function<void(ShapeRemovedEvent)> &handler) {
+        return SubscribeToSignal(handler,m_shapeRemovedSignal);
     }
 
-    Subscription Picture::SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& observer)
-    {
-        m_observerService.AddElement(observer);
-        auto callback = [this, observer] () {
-            m_observerService.RemoveElement(observer);
-        };
-        const auto subscriptionId = SubscribeIdProvider::GetNextSubscribeId();
-        m_subscriptionId = subscriptionId;
+    Subscription Picture::SubscribeToShapeAdded(const std::function<void(ShapeAddedEvent)> &handler) {
+        return SubscribeToSignal(handler,m_shapeAddedSignal);
+    }
 
-        return Subscription(callback, subscriptionId);
+    Subscription Picture::SubscribeToMove(const std::function<void(ShapeMovedEvent)> &handler) {
+        return SubscribeToSignal(handler, m_movedSignal);
+    }
+
+    Subscription Picture::SubscribeToChangedStrategy(const std::function<void(ShapeChangedStrategyEvent)> &handler) {
+        return SubscribeToSignal(handler, m_changedStrategySignal);
+    }
+
+    Subscription Picture::SubscribeToChangedColor(const std::function<void(ShapeChangedColorEvent)> &handler) {
+        return SubscribeToSignal(handler, m_changedColorSignal);
     }
 
     std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)
@@ -165,8 +179,15 @@ namespace model {
         }
     }
 
-    void Picture::NotifyPicturesObservers(const std::string& msg) {
-        const auto event = PictureEvent{msg};
-        m_observerService.NotifyAll(event);
+    void Picture::OnShapeMoved(const ShapeMovedEvent& event) {
+        m_movedSignal.NotifyAll(event);
+    }
+
+    void Picture::OnShapeChangedStrategy(const ShapeChangedStrategyEvent &event) {
+        m_changedStrategySignal.NotifyAll(event);
+    }
+
+    void Picture::OnShapeChangedColor(const ShapeChangedColorEvent &event) {
+        m_changedColorSignal.NotifyAll(event);
     }
 }

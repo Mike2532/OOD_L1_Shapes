@@ -13,8 +13,9 @@ namespace model {
 
         ~Subscription()
         {
-            if (m_onDestroy) {
-                m_onDestroy();
+            try {
+                Unsubscribe();
+            } catch (...) {
             }
         }
 
@@ -38,6 +39,7 @@ namespace model {
         {
             if (m_onDestroy) {
                 m_onDestroy();
+                m_onDestroy = nullptr;
             }
         }
 

@@ -2,15 +2,15 @@
 #define OOD_L1_SHAPES_CALLBACKTESTOBSERVER_H
 
 #include <functional>
-#include "../../IObserverElem.h"
-#include "../ShapeEvent.h"
 
-class CallbackTestObserver : public IObserverElem<model::ShapeEvent>
+template <typename EventType>
+class CallbackTestObserver
 {
 public:
-    void OnChange(const model::ShapeEvent &shapeEvent) override {
+    void OnEvent(const EventType&)
+    {
         m_callCount++;
-        if (m_executable != nullptr) {
+        if (m_executable) {
             m_executable();
         }
     }
@@ -19,12 +19,13 @@ public:
         this->m_executable = executable;
     }
 
-    int GetCallCount() {
+    int GetCallCount() const {
         return m_callCount;
     }
+
 private:
-    std::function<void()> m_executable = nullptr;
+    std::function<void()> m_executable;
     int m_callCount = 0;
 };
 
-#endif //OOD_L1_SHAPES_CALLBACKTESTOBSERVER_H
+#endif // OOD_L1_SHAPES_CALLBACKTESTOBSERVER_H

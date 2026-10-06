@@ -51,21 +51,41 @@ namespace model {
 
         void SetColor(const std::string& color)
         {
+            const auto oldColor = m_color;
+
             RequireColorIsValid(color);
             m_color = color;
-            Notify(ShapeEventType::ColorChanged);
+
+            m_changedColorSignal.NotifyAll(ShapeChangedColorEvent(
+                m_shapeId,
+                oldColor,
+                m_color
+            ));
         }
 
         void SetStrategy(std::unique_ptr<strategy::IShapeStrategy> strategy)
         {
+            const auto oldName = m_strategy->GetStrategyName();
+
             m_strategy = std::move(strategy);
-            Notify(ShapeEventType::StrategyChanged);
+
+            m_changedStrategySignal.NotifyAll(ShapeChangedStrategyEvent (
+                m_shapeId,
+                oldName,
+                m_strategy->GetStrategyName()
+            ));
         }
 
         void Move(double dx, double dy)
         {
             m_strategy->Move(dx, dy);
-            Notify(ShapeEventType::ShapeMoved);
+
+            m_movedSignal.NotifyAll(ShapeMovedEvent(
+               m_shapeId,
+               m_strategy->GetCoords(),
+               dx,
+               dy
+           ));
         }
     private:
         const std::string m_shapeId;
@@ -77,26 +97,6 @@ namespace model {
             if (!std::regex_match(color, pattern)) {
                 throw std::invalid_argument("invalid color. Color must be format #rrggbb");
             }
-        }
-
-        ShapeEvent ConstructEvent(const ShapeEventType& event) override
-        {
-            return ShapeEvent {
-                m_shapeId,
-                GetEventMsg(event)
-            };
-        }
-
-        std::string GetEventMsg(const ShapeEventType& event) const {
-            switch (event) {
-                case ShapeEventType::ColorChanged:
-                    return "shape " + m_shapeId + " change color. New color: " + m_color;
-                case ShapeEventType::StrategyChanged:
-                    return "shape " + m_shapeId + " change stategy. New strategy: " + m_strategy->GetStrategyName();
-                case ShapeEventType::ShapeMoved:
-                    return "shape " + m_shapeId + " change coords. New coords: " + m_strategy->GetCoords();
-            }
-            throw std::invalid_argument("unknown event type");
         }
     };
 }

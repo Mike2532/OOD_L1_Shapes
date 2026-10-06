@@ -3,18 +3,27 @@
 #include <string>
 
 namespace model {
-    enum class ShapeEventType {
-        ColorChanged,
-        StrategyChanged,
-        ShapeMoved,
-    };
-
-    struct ShapeEvent
+    struct ShapeMovedEvent
     {
         const std::string shapeId;
-        const std::string msg;
+        const std::string newCoords;
+        double dx;
+        double dy;
     };
 
+    struct ShapeChangedStrategyEvent
+    {
+        const std::string shapeId;
+        const std::string oldStrategyName;
+        const std::string newStrategyName;
+    };
+
+    struct ShapeChangedColorEvent
+    {
+        const std::string shapeId;
+        const std::string oldColor;
+        const std::string newColor;
+    };
 }
 
 #endif //OOD_L1_SHAPES_EVENT_H

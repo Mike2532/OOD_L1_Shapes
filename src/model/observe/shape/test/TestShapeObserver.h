@@ -1,33 +1,51 @@
 #ifndef OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
 #define OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
 
-#include "../../IObserverElem.h"
+#include <string>
+#include "../../../observe/shape/ShapeEvent.h"
 
-class TestShapeObserver : public IObserverElem<model::ShapeEvent>
+class TestShapeObserver
 {
 public:
-    void OnChange(const model::ShapeEvent &shapeEvent) override
+    void OnMove(const model::ShapeMovedEvent& event)
     {
-        m_lastShapeId = shapeEvent.shapeId;
-        m_lastShapeMsg = shapeEvent.msg;
-        notificationsCounter++;
+        m_lastShapeId = event.shapeId;
+        m_lastShapeMsg = "shape " + event.shapeId + " change coords. New coords: " + event.newCoords;
+        m_notificationsCounter++;
     }
 
-    std::string GetLastShapeId() {
-        return m_lastShapeId;
+    void OnColorChanged(const model::ShapeChangedColorEvent& event)
+    {
+        m_lastShapeId = event.shapeId;
+        m_lastShapeMsg = "shape " + event.shapeId + " change color. New color: " + event.newColor;
+        m_notificationsCounter++;
     }
 
-    std::string GetLastShapeMsg() {
-        return m_lastShapeMsg;
+    void OnStrategyChanged(const model::ShapeChangedStrategyEvent& event)
+    {
+        m_lastShapeId = event.shapeId;
+        m_lastShapeMsg = "shape " + event.shapeId + " change stategy. New strategy: " + event.newStrategyName;
+        m_notificationsCounter++;
     }
 
-    int GetNotificationsCounter() {
-        return notificationsCounter;
+    auto GetMoveHandler() {
+        return [this](const model::ShapeMovedEvent& e) { OnMove(e); };
     }
+    auto GetColorHandler() {
+        return [this](const model::ShapeChangedColorEvent& e) { OnColorChanged(e); };
+    }
+    auto GetStrategyHandler() {
+        return [this](const model::ShapeChangedStrategyEvent& e) { OnStrategyChanged(e); };
+    }
+
+    std::string GetLastShapeId() const { return m_lastShapeId; }
+    std::string GetLastShapeMsg() const { return m_lastShapeMsg; }
+    int GetNotificationsCounter() const { return m_notificationsCounter; }
+
 private:
     std::string m_lastShapeId;
     std::string m_lastShapeMsg;
-    int notificationsCounter = 0;
+    int m_notificationsCounter = 0;
 };
 
-#endif //OOD_L1_SHAPES_TESTSHAPEOBSERVER_H
+#endif // OOD_L1_SHAPES_TESTSHAPEOBSERVER_H

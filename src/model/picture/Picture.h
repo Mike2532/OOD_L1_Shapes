@@ -18,7 +18,7 @@
 #include "../observe/picture/PictureEvent.h"
 
 namespace model {
-    class Picture : public IObserverElem<ShapeEvent>, public std::enable_shared_from_this<Picture>
+    class Picture
     {
     public:
         Picture(
@@ -40,10 +40,14 @@ namespace model {
         void List(std::ostream& output = std::cout);
         void MovePicture(const MovePictureData& data);
         void DrawPicture();
-        void OnChange(const ShapeEvent& shapeEvent) override;
-        Subscription SubscribePictureObserver(const std::weak_ptr<IObserverElem<PictureEvent>>& pictureObserver);
+
+        Subscription SubscribeToShapeRemoved(const std::function<void(ShapeRemovedEvent)>& handler);
+        Subscription SubscribeToShapeAdded(const std::function<void(ShapeAddedEvent)>& handler);
+        Subscription SubscribeToMove(const std::function<void(ShapeMovedEvent)>& handler);
+        Subscription SubscribeToChangedStrategy(const std::function<void(ShapeChangedStrategyEvent)> &handler);
+        Subscription SubscribeToChangedColor(const std::function<void(ShapeChangedColorEvent)>& handler);
+
     private:
-        ObserverManager<PictureEvent> m_observerService;
         std::unique_ptr<IShapeStorage> m_shapeStorage;
         std::unique_ptr<strategy::IStrategyStorage> m_strategyStorage;
         std::unique_ptr<gfx::ICanvas> m_canvas;
@@ -52,9 +56,29 @@ namespace model {
         std::unique_ptr<strategy::IShapeStrategy> GetExistingStrategy(const std::string& shapeType, const std::vector<std::string>& args);
         int m_subscriptionId;
 
+        SignalManager<ShapeMovedEvent> m_movedSignal;
+        SignalManager<ShapeChangedColorEvent> m_changedColorSignal;
+        SignalManager<ShapeChangedStrategyEvent> m_changedStrategySignal;
+        SignalManager<ShapeAddedEvent> m_shapeAddedSignal;
+        SignalManager<ShapeRemovedEvent> m_shapeRemovedSignal;
+
         void RequireShapeDoesNotExist(const std::string& id);
         void ShowShapes(const std::vector<std::shared_ptr<Shape>>& shapes);
-        void NotifyPicturesObservers(const std::string& msg);
+        void OnShapeMoved(const ShapeMovedEvent& event);
+        void OnShapeChangedStrategy(const ShapeChangedStrategyEvent& event);
+        void OnShapeChangedColor(const ShapeChangedColorEvent& event);
+
+        template <typename T>
+        Subscription SubscribeToSignal(const std::function<void(T)>& handler,SignalManager<T>& signalManager)
+        {
+            const auto subscriptionId = SubscribeIdProvider::GetNextSubscribeId();
+            signalManager.AddObserver(handler, subscriptionId);
+            auto callback = [subscriptionId, &signalManager] () {
+                signalManager.RemoveObserver(subscriptionId);
+            };
+            m_subscriptionId = subscriptionId;
+            return Subscription(callback, subscriptionId);
+        }
     };
 }
 

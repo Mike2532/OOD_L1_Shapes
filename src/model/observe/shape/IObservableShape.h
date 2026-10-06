@@ -5,6 +5,7 @@
 #include "../storage/ObserverManager.h"
 #include "../Subscription.h"
 #include "../../SubscribeIdProvider.h"
+#include "../signal/SignalManager.h"
 
 namespace model {
     class IObservableShape
@@ -12,32 +13,45 @@ namespace model {
     public:
         virtual ~IObservableShape() = default;
 
-        Subscription Subscribe(const std::weak_ptr<IObserverElem<ShapeEvent>>& observer)
+        Subscription SubscribeToMove(const std::function<void(ShapeMovedEvent)>& handler)
         {
-            m_observerService.AddElement(observer);
-            auto callback = [this, observer] () {
-                m_observerService.RemoveElement(observer);
-            };
-            const auto subscriptionId = SubscribeIdProvider::GetNextSubscribeId();
-            m_subscriptionId = subscriptionId;
+            return SubscribeToSignal(handler, m_movedSignal);
+        }
 
+        Subscription SubscribeToChangedStrategy(const std::function<void(ShapeChangedStrategyEvent)> &handler)
+        {
+            return SubscribeToSignal(handler, m_changedStrategySignal);
+        }
+
+        Subscription SubscribeToChangedColor(const std::function<void(ShapeChangedColorEvent)>& handler)
+        {
+            return SubscribeToSignal(handler, m_changedColorSignal);
+        }
+
+        std::vector<int> GetSubscriptionIds()
+        {
+            return m_subscriptionIds;
+        }
+    private:
+        template <typename T>
+        Subscription SubscribeToSignal(
+            const std::function<void(T)>& handler,
+            SignalManager<T>& signalManager
+        ) {
+            const auto subscriptionId = SubscribeIdProvider::GetNextSubscribeId();
+            signalManager.AddObserver(handler, subscriptionId);
+            auto callback = [subscriptionId, &signalManager] () {
+                signalManager.RemoveObserver(subscriptionId);
+            };
+            m_subscriptionIds.emplace_back(subscriptionId);
             return Subscription(callback, subscriptionId);
         }
 
-        int GetSubscriptionId()
-        {
-            return m_subscriptionId;
-        }
+        std::vector<int> m_subscriptionIds;
     protected:
-        void Notify(const ShapeEventType& eventType) {
-            const auto event = ConstructEvent(eventType);
-            m_observerService.NotifyAll(event);
-        }
-    private:
-        ObserverManager<ShapeEvent> m_observerService;
-        int m_subscriptionId;
-
-        virtual ShapeEvent ConstructEvent(const ShapeEventType& event) = 0;
+        SignalManager<ShapeMovedEvent> m_movedSignal;
+        SignalManager<ShapeChangedColorEvent> m_changedColorSignal;
+        SignalManager<ShapeChangedStrategyEvent> m_changedStrategySignal;
     };
 }
 

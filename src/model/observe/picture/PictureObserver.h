@@ -5,10 +5,10 @@
 #include <iostream>
 
 #include "PictureEvent.h"
-#include "../IObserverElem.h"
+#include "../shape/ShapeEvent.h"
 
 namespace model {
-    class PictureObserver : public IObserverElem<PictureEvent>
+    class PictureObserver
     {
     public:
         explicit PictureObserver(std::ostream& output = std::cout)
@@ -16,10 +16,32 @@ namespace model {
         {
         }
 
-        void OnChange(const PictureEvent& event) override
-        {
-            m_output << event.msg << std::endl;
+        void OnShapeRemoved(const ShapeRemovedEvent& event) {
+            m_output << "Removed " << event.shapeId << " from Picture" << std::endl;
         }
+
+        void OnShapeAdded(const ShapeAddedEvent& event) {
+            m_output << "Added " << event.shapeId << " to Picture" << std::endl;
+        }
+
+        void OnShapeMoved(const ShapeMovedEvent& event) {
+            m_output << "Picture changed. " << event.shapeId
+                     << ": shape " << event.shapeId << " change coords. New coords: "
+                     << event.newCoords << std::endl;
+        }
+
+        void OnShapeChangedStrategy(const ShapeChangedStrategyEvent &event) {
+            m_output << "Picture changed. " << event.shapeId
+                     << ": shape " << event.shapeId << " change strategy. New strategy: "
+                     << event.newStrategyName << std::endl;
+        }
+
+        void OnShapeChangedColor(const ShapeChangedColorEvent &event) {
+            m_output << "Picture changed. " << event.shapeId
+                     << ": shape " << event.shapeId << " change color. New color: "
+                     << event.newColor << std::endl;
+        }
+
     private:
         std::ostream& m_output;
     };

@@ -48,6 +48,8 @@ add_executable(GfxTest src/gfx/impl/test/Test.cpp
         src/model/observe/IObserverElem.h
         src/model/observe/Subscription.h
         src/model/SubscribeIdProvider.h
+        src/model/observe/test/SubscriptionTest.cpp
+        src/model/observe/signal/SignalManager.h
 )
 target_link_libraries(GfxTest PRIVATE lib_utils)
 target_link_libraries(GfxTest PRIVATE Catch2::Catch2WithMain)
@@ -64,3 +66,8 @@ add_executable(ShapeObserverTest src/model/observe/shape/test/Test.cpp
 target_link_libraries(ShapeObserverTest PRIVATE lib_utils)
 target_link_libraries(ShapeObserverTest PRIVATE Catch2::Catch2WithMain)
 target_link_options(ShapeObserverTest PRIVATE "LINKER:-all_load")
+
+add_executable(SubscriptionTest src/model/observe/test/SubscriptionTest.cpp)
+target_link_libraries(SubscriptionTest PRIVATE lib_utils)
+target_link_libraries(SubscriptionTest PRIVATE Catch2::Catch2WithMain)
+target_link_options(SubscriptionTest PRIVATE "LINKER:-all_load")
