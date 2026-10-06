@@ -2,7 +2,6 @@
 #define OOD_L1_SHAPES_INOTIFICATEDSHAPE_H
 
 #include "ShapeEvent.h"
-#include "../storage/ObserverManager.h"
 #include "../Subscription.h"
 #include "../../SubscribeIdProvider.h"
 #include "../signal/SignalManager.h"
