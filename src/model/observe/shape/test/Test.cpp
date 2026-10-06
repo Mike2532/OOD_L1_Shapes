@@ -88,7 +88,7 @@ TEST_CASE("observer unsubscribe and will not get notifications")
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
 
-    subscription.Unsubscribe();
+    subscription.disconnect();
 
     int counterBefore = shapeObserver->GetNotificationsCounter();
     testShape.Move(5, 6);
@@ -138,7 +138,7 @@ TEST_CASE("unsubscribe one of observers during notifications")
     auto thirdSubscription = testShape.SubscribeToMove([callbackObserver3](const auto& e){ callbackObserver3->OnEvent(e); });
 
     callbackObserver1->SetExecutable([&secondSubscription]() {
-        secondSubscription.Unsubscribe();
+        secondSubscription.disconnect();
     });
 
     testShape.Move(3, 4);
@@ -156,7 +156,7 @@ TEST_CASE("add new observer during notifications")
     auto callbackObserver2 = std::make_shared<CallbackTestObserver<model::ShapeMovedEvent>>();
 
     auto subscription1 = testShape.SubscribeToMove([callbackObserver1](const auto& e){ callbackObserver1->OnEvent(e); });
-    std::optional<model::Subscription> subscription2;
+    std::optional<boost::signals2::scoped_connection> subscription2;
 
     callbackObserver1->SetExecutable([&testShape, callbackObserver2, &subscription2]() {
         if (subscription2.has_value()) {
@@ -182,8 +182,8 @@ TEST_CASE("double unsubscribe is safe")
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
 
-    subscription.Unsubscribe();
-    subscription.Unsubscribe();
+    subscription.disconnect();
+    subscription.disconnect();
 
     int counterBefore = shapeObserver->GetNotificationsCounter();
     testShape.Move(5, 6);
@@ -207,7 +207,7 @@ TEST_CASE("dont get notifications after destroying subscription object")
 
 TEST_CASE("destroying shape before subscription unsubscribe")
 {
-    std::optional<model::Subscription> subscription;
+    std::optional<boost::signals2::scoped_connection> subscription;
     auto shapeObserver = std::make_shared<TestShapeObserver>();
 
     {
@@ -215,7 +215,7 @@ TEST_CASE("destroying shape before subscription unsubscribe")
         subscription = testShape.SubscribeToMove(shapeObserver->GetMoveHandler());
     }
 
-    subscription->Unsubscribe();
+    subscription->disconnect();
 }
 
 TEST_CASE("move subscription with save connections")

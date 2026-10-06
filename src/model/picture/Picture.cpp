@@ -20,22 +20,17 @@ namespace model {
         const auto shape = std::make_shared<Shape>(data.id, color, std::move(strategy));
         m_shapeStorage->Store(shape);
 
-        auto moveSubscription = shape->SubscribeToMove([this](const ShapeMovedEvent& event) {
+        m_connections[data.id].push_back(shape->SubscribeToMove([this](const ShapeMovedEvent& event) {
             OnShapeMoved(event);
-        });
-        m_subscriptions.push_back(std::move(moveSubscription));
-
-        auto changeStrategySubscription = shape->SubscribeToChangedStrategy([this](const ShapeChangedStrategyEvent& event) {
+        }));
+        m_connections[data.id].push_back(shape->SubscribeToChangedStrategy([this](const ShapeChangedStrategyEvent& event) {
             OnShapeChangedStrategy(event);
-        });
-        m_subscriptions.push_back(std::move(changeStrategySubscription));
-
-        auto changeColorSubscription = shape->SubscribeToChangedColor([this](const ShapeChangedColorEvent& event) {
+        }));
+        m_connections[data.id].push_back(shape->SubscribeToChangedColor([this](const ShapeChangedColorEvent& event) {
             OnShapeChangedColor(event);
-        });
-        m_subscriptions.push_back(std::move(changeColorSubscription));
+        }));
 
-        m_shapeAddedSignal.NotifyAll(ShapeAddedEvent(data.id));
+        m_shapeAddedSignal(ShapeAddedEvent(data.id));
     }
 
     void Picture::MoveShape(const MoveShapeData& data)
@@ -47,21 +42,12 @@ namespace model {
     void Picture::DeleteShape(const DeleteShapeData& data)
     {
         const auto shape = GetExistingShape(data.id);
-        auto subscriptionIds = shape->GetSubscriptionIds();
 
-        for (const auto& subscriptionId : subscriptionIds) {
-            const auto subscriptionIt = std::find_if(m_subscriptions.begin(), m_subscriptions.end(),
-                [subscriptionId] (const Subscription& subscription) {
-                    return subscription.GetSubscriptionId() == subscriptionId;
-            });
-            if (subscriptionIt != m_subscriptions.end()) {
-                subscriptionIt->Unsubscribe();
-            }
-        }
+        m_connections.erase(data.id);
 
         m_shapeStorage->DeleteById(data.id);
 
-        m_shapeRemovedSignal.NotifyAll(ShapeRemovedEvent(data.id));
+        m_shapeRemovedSignal(ShapeRemovedEvent(data.id));
     }
 
     void Picture::ChangeColor(const ChangeColorData& data)
@@ -115,24 +101,24 @@ namespace model {
         ShowShapes(shapes);
     }
 
-    Subscription Picture::SubscribeToShapeRemoved(const std::function<void(ShapeRemovedEvent)> &handler) {
-        return SubscribeToSignal(handler,m_shapeRemovedSignal);
+    boost::signals2::scoped_connection Picture::SubscribeToShapeRemoved(const std::function<void(ShapeRemovedEvent)> &handler) {
+        return m_shapeRemovedSignal.connect(handler);
     }
 
-    Subscription Picture::SubscribeToShapeAdded(const std::function<void(ShapeAddedEvent)> &handler) {
-        return SubscribeToSignal(handler,m_shapeAddedSignal);
+    boost::signals2::scoped_connection Picture::SubscribeToShapeAdded(const std::function<void(ShapeAddedEvent)> &handler) {
+        return m_shapeAddedSignal.connect(handler);
     }
 
-    Subscription Picture::SubscribeToMove(const std::function<void(ShapeMovedEvent)> &handler) {
-        return SubscribeToSignal(handler, m_movedSignal);
+    boost::signals2::scoped_connection Picture::SubscribeToMove(const std::function<void(ShapeMovedEvent)> &handler) {
+        return m_movedSignal.connect(handler);
     }
 
-    Subscription Picture::SubscribeToChangedStrategy(const std::function<void(ShapeChangedStrategyEvent)> &handler) {
-        return SubscribeToSignal(handler, m_changedStrategySignal);
+    boost::signals2::scoped_connection Picture::SubscribeToChangedStrategy(const std::function<void(ShapeChangedStrategyEvent)> &handler) {
+        return m_changedStrategySignal.connect(handler);
     }
 
-    Subscription Picture::SubscribeToChangedColor(const std::function<void(ShapeChangedColorEvent)> &handler) {
-        return SubscribeToSignal(handler, m_changedColorSignal);
+    boost::signals2::scoped_connection Picture::SubscribeToChangedColor(const std::function<void(ShapeChangedColorEvent)> &handler) {
+        return m_changedColorSignal.connect(handler);
     }
 
     std::shared_ptr<Shape> Picture::GetExistingShape(const std::string &id)
@@ -180,14 +166,14 @@ namespace model {
     }
 
     void Picture::OnShapeMoved(const ShapeMovedEvent& event) {
-        m_movedSignal.NotifyAll(event);
+        m_movedSignal(event);
     }
 
     void Picture::OnShapeChangedStrategy(const ShapeChangedStrategyEvent &event) {
-        m_changedStrategySignal.NotifyAll(event);
+        m_changedStrategySignal(event);
     }
 
     void Picture::OnShapeChangedColor(const ShapeChangedColorEvent &event) {
-        m_changedColorSignal.NotifyAll(event);
+        m_changedColorSignal(event);
     }
 }

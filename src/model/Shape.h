@@ -56,7 +56,7 @@ namespace model {
             RequireColorIsValid(color);
             m_color = color;
 
-            m_changedColorSignal.NotifyAll(ShapeChangedColorEvent(
+            m_changedColorSignal(ShapeChangedColorEvent(
                 m_shapeId,
                 oldColor,
                 m_color
@@ -69,7 +69,7 @@ namespace model {
 
             m_strategy = std::move(strategy);
 
-            m_changedStrategySignal.NotifyAll(ShapeChangedStrategyEvent (
+            m_changedStrategySignal(ShapeChangedStrategyEvent (
                 m_shapeId,
                 oldName,
                 m_strategy->GetStrategyName()
@@ -80,7 +80,7 @@ namespace model {
         {
             m_strategy->Move(dx, dy);
 
-            m_movedSignal.NotifyAll(ShapeMovedEvent(
+            m_movedSignal(ShapeMovedEvent(
                m_shapeId,
                m_strategy->GetCoords(),
                dx,

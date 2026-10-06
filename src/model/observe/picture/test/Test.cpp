@@ -121,8 +121,8 @@ TEST_CASE("unsubscribe")
     REQUIRE(output.str() == "Added testId to Picture\n");
     output.str("");
 
-    subAdded.Unsubscribe();
-    subMoved.Unsubscribe();
+    subAdded.disconnect();
+    subMoved.disconnect();
 
     auto data = MoveShapeData(TEST_PICTURE_ID, 3, 4);
     picture->MoveShape(data);
