@@ -44,9 +44,15 @@ public:
         };
     }
 
-    std::string GetLastShapeId() const { return m_lastShapeId; }
-    std::string GetLastShapeMsg() const { return m_lastShapeMsg; }
-    int GetNotificationsCounter() const { return m_notificationsCounter; }
+    std::string GetLastShapeId() const {
+        return m_lastShapeId;
+    }
+    std::string GetLastShapeMsg() const {
+        return m_lastShapeMsg;
+    }
+    int GetNotificationsCounter() const {
+        return m_notificationsCounter;
+    }
 
 private:
     std::string m_lastShapeId;
