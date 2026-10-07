@@ -29,13 +29,19 @@ public:
     }
 
     auto GetMoveHandler() {
-        return [this](const model::ShapeMovedEvent& e) { OnMove(e); };
+        return [this](const model::ShapeMovedEvent& e) {
+            OnMove(e);
+        };
     }
     auto GetColorHandler() {
-        return [this](const model::ShapeChangedColorEvent& e) { OnColorChanged(e); };
+        return [this](const model::ShapeChangedColorEvent& e) {
+            OnColorChanged(e);
+        };
     }
     auto GetStrategyHandler() {
-        return [this](const model::ShapeChangedStrategyEvent& e) { OnStrategyChanged(e); };
+        return [this](const model::ShapeChangedStrategyEvent& e) {
+            OnStrategyChanged(e);
+        };
     }
 
     std::string GetLastShapeId() const { return m_lastShapeId; }
