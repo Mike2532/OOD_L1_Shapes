@@ -86,7 +86,7 @@ TEST_CASE("two subscribers")
     REQUIRE(output2.str() == "Added testId to Picture\n");
 }
 
-TEST_CASE("double subscribe produces TWO notifications")
+TEST_CASE("double subscribe produces two notifications")
 {
     std::ostringstream output;
     auto pictureObserver = std::make_shared<model::PictureObserver>(output);

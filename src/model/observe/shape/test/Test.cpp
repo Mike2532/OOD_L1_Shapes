@@ -53,9 +53,9 @@ TEST_CASE("base notifications scenario")
     auto testShape = GetTestShape();
     auto shapeObserver = std::make_shared<TestShapeObserver>();
 
-    auto subMove = testShape.SubscribeToMove(shapeObserver->GetMoveHandler());
-    auto subColor = testShape.SubscribeToChangedColor(shapeObserver->GetColorHandler());
-    auto subStrategy = testShape.SubscribeToChangedStrategy(shapeObserver->GetStrategyHandler());
+    auto subscriptionMove = testShape.SubscribeToMove(shapeObserver->GetMoveHandler());
+    auto subscriptionColor = testShape.SubscribeToChangedColor(shapeObserver->GetColorHandler());
+    auto subscriptionStrategy = testShape.SubscribeToChangedStrategy(shapeObserver->GetStrategyHandler());
 
     MoveJustInitedTestShape(&testShape, shapeObserver);
     ChangeTestShapeColorAfterMoving(&testShape, shapeObserver);
