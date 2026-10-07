@@ -44,7 +44,6 @@ add_executable(GfxTest src/gfx/impl/test/Test.cpp
         src/parser/dataConsturctor/DataConstructor.h
         src/parser/exception/UnknownUserCommandException.h
         src/parser/Parser.cpp
-        src/model/observe/storage/ObserverManager.h
         src/model/observe/IObserverElem.h
         src/model/observe/Subscription.h
         src/model/SubscribeIdProvider.h
