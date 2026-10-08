@@ -1,3 +1,4 @@
+#include <iostream>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
@@ -108,6 +109,26 @@ TEST_CASE("two observers get notifications")
 
     REQUIRE(shapeObserver1->GetNotificationsCounter() == 1);
     REQUIRE(shapeObserver2->GetNotificationsCounter() == 1);
+}
+
+TEST_CASE("exception")
+{
+    auto testShape = GetTestShape();
+    auto shapeObserver1 = std::make_shared<TestShapeObserver>();
+    auto shapeObserver2 = std::make_shared<TestShapeObserver>();
+
+    auto subscription1 = testShape.SubscribeToMove([](const model::ShapeMovedEvent& event) {
+        throw std::runtime_error("runtime_error");
+    });
+    auto subscription2 = testShape.SubscribeToMove(shapeObserver2->GetMoveHandler());
+
+    REQUIRE_THROWS_AS(
+        testShape.Move(5, 6),
+        std::runtime_error
+    );
+
+    REQUIRE(shapeObserver1->GetNotificationsCounter() == 0);
+    REQUIRE(shapeObserver2->GetNotificationsCounter() == 0);
 }
 
 TEST_CASE("An unsuccessful operation that does not change the state of the object does not result in a notification")
